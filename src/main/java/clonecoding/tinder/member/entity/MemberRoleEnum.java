@@ -9,9 +9,7 @@ public enum MemberRoleEnum {
     //user를 사용하면 "ROLE_USER"를 리턴
     USER(Authority.USER);  // 사용자 권한
 
-
     private final String authority;
-
 
     MemberRoleEnum(String authority) {
         this.authority = authority;

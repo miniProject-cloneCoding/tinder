@@ -20,6 +20,9 @@ public class Member {
     private String nickName;
 
     @Column(nullable = false)
+    private String password;
+
+    @Column(nullable = false)
     private String birthDate;
 
     @Column(nullable = false)

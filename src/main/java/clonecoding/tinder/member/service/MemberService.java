@@ -26,7 +26,6 @@ public class MemberService {
          *
          */
 
-
         //시작은 010으로 시작, 뒤에는 숫자만 8자리가 와야함.
         String phoneRegExp = "^010(\\d{8})$";
 
@@ -42,8 +41,6 @@ public class MemberService {
         if (existMember.isPresent()) {
             return new MemberResponseMsgDto("이미 가입한 회원입니다!", HttpStatus.BAD_REQUEST.value());
         }
-
-
 
 
         /*
@@ -69,6 +66,16 @@ public class MemberService {
 //        String nickNameRegExp = "^[가-힣a-zA-Z]{2,6}$";
         if (!memberJoinRequestDto.getNickName().matches("^[가-힣a-zA-Z]{2,6}$")) {
             return new MemberResponseMsgDto("닉네임 양식을 지켜주세요!", HttpStatus.BAD_REQUEST.value());
+        }
+
+
+        /*
+         * 비밀번호 검증입니다.
+         *
+         */
+        // ?= 뒷부분을 확인하겠다. .* 하나라도 있는 지 체크. .은 어떤 한 개의 문자, *은 앞의 문자가 0개 이상 있음을 의미.
+        if (memberJoinRequestDto.getPassword().matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,12}$")) {
+            return new MemberResponseMsgDto("비밀번호는 영어 대소문자, 숫자의 최소 8자에서 최대 12자리여야 합니다.", HttpStatus.BAD_REQUEST.value());
         }
 
 
