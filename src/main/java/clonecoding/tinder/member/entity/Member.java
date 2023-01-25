@@ -1,12 +1,13 @@
 package clonecoding.tinder.member.entity;
 
-import lombok.Generated;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
-@NoArgsConstructor
+@Getter
+@Builder
+@AllArgsConstructor
 public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,4 +27,6 @@ public class Member {
 
     @Column(nullable = false)
     private String email;
+
+    public Member() {}
 }
