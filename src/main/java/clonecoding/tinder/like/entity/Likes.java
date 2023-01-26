@@ -20,4 +20,8 @@ public class Likes {
         this.likedMember = likedMember;
         this.likingMember = likingMember;
     }
+
+    public Long getLikedMember() {
+        return likedMember;
+    }
 }
