@@ -14,5 +14,5 @@ public class Likes {
 
     private Long likedMember;
 
-    private Long likingMember;
+    private Long likingMember;    
 }
