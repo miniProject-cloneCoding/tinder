@@ -31,5 +31,8 @@ public class Member {
     @Column(nullable = false)
     private String email;
 
+    private double latitude;
+    private double longitude;
+
     public Member() {}
 }
