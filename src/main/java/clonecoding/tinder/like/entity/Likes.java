@@ -19,4 +19,9 @@ public class Likes {
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member likingMember;
+
+    public Likes(Member likedMember, Member likingMember) {
+        this.likedMember = likedMember;
+        this.likingMember = likingMember;
+    }
 }
