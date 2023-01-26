@@ -46,6 +46,9 @@ public class WebSecurityConfig {
         http.authorizeRequests()
                 //멤버 api는 인증을 받지 않는다.
                 .antMatchers("/member/**").permitAll()
+                .antMatchers("/swagger-ui.html").permitAll()
+                .antMatchers("/swagger-resources/**").permitAll()
+                .antMatchers("/v2/api-docs").permitAll()
                 //다른 것들은 전부 인증을 받아야 한다.
                 .anyRequest().authenticated()
                 // JWT 인증/인가를 사용하기 위한 설정
@@ -54,8 +57,8 @@ public class WebSecurityConfig {
                 .and().addFilterBefore(new JwtAuthFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
 
-        //폼로그인 일단 꺼두기
-        http.formLogin().disable();
+//        //폼로그인 일단 꺼두기
+//        http.formLogin().disable();
 
         //일단 폼로그인인지 뭔지 몰라서 주석처리
 //        http.formLogin().loginPage("/member/login").permitAll();
