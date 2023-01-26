@@ -50,7 +50,8 @@ public class MembersService {
 //                .collect(Collectors.toList()));
 
         //전체 회원 중 이미 좋아요한 회원 제외하고 가져오기
-        List<Member> members = memberRepository.findAllWithoutLike(my.getId(), pageable.getOffset(), pageable.getPageSize());
+        //파라미터 (내 아이디, 페이지번호, 페이지 사이즈)
+        List<Member> members = memberRepository.findAllWithoutLike(my.getId(), Long.valueOf(pageable.getOffset()).intValue(), pageable.getPageSize());
 
         //entity -> dto 변환
         Stream<MembersResponseDto> dtoList = members.stream().map(MembersResponseDto::fromEntity);
