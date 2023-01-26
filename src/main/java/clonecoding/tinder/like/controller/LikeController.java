@@ -1,11 +1,20 @@
 package clonecoding.tinder.like.controller;
 
+import clonecoding.tinder.like.dto.LikeResponseDto;
+import clonecoding.tinder.like.service.LikeService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/like")
 public class LikeController {
+    private final LikeService likeService;
+
+    //좋아요
+    @PatchMapping("like/{id}")
+    public LikeResponseDto like(@PathVariable Long id, @RequestBody HttpServletRequest request) {
+        return likeService.like(id,request);
+    }
 }
