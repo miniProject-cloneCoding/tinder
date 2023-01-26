@@ -1,4 +1,4 @@
-package clonecoding.tinder.members_temp.dto;
+package clonecoding.tinder.members.dto;
 
 import clonecoding.tinder.member.entity.Member;
 import lombok.AllArgsConstructor;

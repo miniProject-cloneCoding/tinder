@@ -1,9 +1,11 @@
-package clonecoding.tinder.members_temp.service;
+package clonecoding.tinder.members.service;
 
 import clonecoding.tinder.jwt.JwtUtil;
+import clonecoding.tinder.like.entity.Likes;
+import clonecoding.tinder.like.repository.LikeRepository;
 import clonecoding.tinder.member.entity.Member;
 import clonecoding.tinder.member.repository.MemberRepository;
-import clonecoding.tinder.members_temp.dto.MembersResponseDto;
+import clonecoding.tinder.members.dto.MembersResponseDto;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +25,7 @@ import java.util.stream.Stream;
 public class MembersService {
 
     private final MemberRepository memberRepository;
+    private final LikeRepository likeRepository;
     private final JwtUtil jwtUtil;
 
     @PostConstruct
@@ -40,6 +43,9 @@ public class MembersService {
         memberRepository.save(member4);
         memberRepository.save(member5);
         memberRepository.save(member6);
+
+        Likes likes = new Likes(member5.getId(), member1.getId());
+        likeRepository.save(likes);
     }
 
     public Page<MembersResponseDto> getMembers(Pageable pageable, String phoneNum) {
