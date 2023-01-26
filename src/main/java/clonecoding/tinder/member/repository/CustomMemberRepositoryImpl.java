@@ -1,16 +1,12 @@
 package clonecoding.tinder.member.repository;
 
 import clonecoding.tinder.member.entity.Member;
-import com.querydsl.jpa.JPAExpressions;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import java.util.List;
 
-import static clonecoding.tinder.like.entity.QLikes.likes;
-import static clonecoding.tinder.member.entity.QMember.member;
 
 public class CustomMemberRepositoryImpl implements CustomMemberRepository {
 
@@ -53,6 +49,19 @@ public class CustomMemberRepositoryImpl implements CustomMemberRepository {
         //페이징 처리
         query.setFirstResult(offset);
         query.setMaxResults(limit);
+
+        return query.getResultList();
+    }
+
+    @Override
+    public List<Member> findAllWithoutPaging(Long myId) {
+        //조회할 회원 중 나 자신은 제외하고, 내가 이미 좋아요 한 회원도 제외함
+        TypedQuery<Member> query = em.createQuery("select m from Member m where m.id != :myId and m.id not in " +
+                "(select l.likedMember from Likes l where l.likingMember = :myId2) ", Member.class);
+
+        //파라미터 바인딩
+        query.setParameter("myId", myId);
+        query.setParameter("myId2", myId);
 
         return query.getResultList();
     }

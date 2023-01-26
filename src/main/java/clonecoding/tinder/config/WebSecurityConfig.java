@@ -55,7 +55,7 @@ public class WebSecurityConfig {
 
 
         //폼로그인 일단 꺼두기
-        http.formLogin().disable();
+//        http.formLogin().disable();
 
         //일단 폼로그인인지 뭔지 몰라서 주석처리
 //        http.formLogin().loginPage("/member/login").permitAll();

@@ -20,6 +20,7 @@ public class LikeService {
     private final MemberRepository memberRepository;
     private final LikeRepository likeRepository;
     public LikeResponseDto like(Long id, HttpServletRequest request) {
+
         //Request에서 토큰 가져오기
         String token = jwtUtil.resolveToken(request);
         Claims claims;
