@@ -42,11 +42,11 @@ public class MembersService {
         memberRepository.save(member6);
     }
 
-    public Page<MembersResponseDto> getMembers(HttpServletRequest request, Pageable pageable) {
+    public Page<MembersResponseDto> getMembers(Pageable pageable, String phoneNum) {
 
-        // 토큰에서 사용자 이름 가져오기
-        Claims claims = getClaims(request);
-        String phoneNum = claims.getSubject();
+//        // 토큰에서 사용자 이름 가져오기
+//        Claims claims = getClaims(request);
+//        String phoneNum = claims.getSubject();
 
         Member my = memberRepository.findByPhoneNum(phoneNum).orElseThrow(() -> new IllegalArgumentException("로그인을 해주세요"));
 

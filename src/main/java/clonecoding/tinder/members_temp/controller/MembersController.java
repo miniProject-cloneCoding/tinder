@@ -2,10 +2,12 @@ package clonecoding.tinder.members_temp.controller;
 
 import clonecoding.tinder.members_temp.dto.MembersResponseDto;
 import clonecoding.tinder.members_temp.service.MembersService;
+import clonecoding.tinder.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,8 +23,8 @@ public class MembersController {
 
     // 전체 회원 조회해서 가져오기
     @GetMapping
-    public Page<MembersResponseDto> getMembers(Pageable pageable, HttpServletRequest request) {
+    public Page<MembersResponseDto> getMembers(Pageable pageable, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         log.info("컨트롤러 실행");
-        return  membersService.getMembers(request, pageable);
+        return  membersService.getMembers(pageable, userDetails.getMember().getPhoneNum());
     }
 }

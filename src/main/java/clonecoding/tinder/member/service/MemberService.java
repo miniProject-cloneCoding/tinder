@@ -124,7 +124,9 @@ public class MemberService {
 //        if (!passwordEncoder.matches(password, member.getPassword())) {
 //            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
 //        }
-//todo 주석풀기
+//todo 주석
+//
+// 풀기
 
         //헤더에 토큰 추가
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(member.getPhoneNum()));
