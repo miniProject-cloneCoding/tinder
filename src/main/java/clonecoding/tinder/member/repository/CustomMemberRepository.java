@@ -7,4 +7,5 @@ import java.util.List;
 public interface CustomMemberRepository {
 
     List<Member> findAllWithoutLike(Long myId, int offset, int limit);
+    List<Member> findAllWithoutPaging(Long myId);
 }

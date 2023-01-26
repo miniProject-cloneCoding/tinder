@@ -1,4 +1,4 @@
-package clonecoding.tinder.members_temp.dto;
+package clonecoding.tinder.members.dto;
 
 import clonecoding.tinder.member.entity.Member;
 import lombok.AllArgsConstructor;
@@ -19,6 +19,7 @@ public class MembersResponseDto {
     private double latitude;
     private double longitude;
     private double distance;
+    private int age;
 
 
     public MembersResponseDto(Member member) {
