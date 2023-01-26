@@ -12,11 +12,7 @@ public class Likes {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "member_id")
-    private Member likedMember;
+    private Long likedMember;
 
-    @ManyToOne
-    @JoinColumn(name = "member_id")
-    private Member likingMember;
+    private Long likingMember;
 }
