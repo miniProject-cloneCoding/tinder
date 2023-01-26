@@ -1,5 +1,6 @@
 package clonecoding.tinder.like.entity;
 
+import clonecoding.tinder.member.entity.Member;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
@@ -11,9 +12,16 @@ public class Likes {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String likedName;
+    private Long likedMember;
 
-    @Column(nullable = false)
-    private String likingName;
+    private Long likingMember;
+
+    public Likes(Long likedMember, Long likingMember) {
+        this.likedMember = likedMember;
+        this.likingMember = likingMember;
+    }
+
+    public Long getLikedMember() {
+        return likedMember;
+    }
 }
