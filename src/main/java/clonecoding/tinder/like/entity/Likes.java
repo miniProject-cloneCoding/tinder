@@ -12,16 +12,7 @@ public class Likes {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "member_id")
-    private Member likedMember;
+    private Long likedMember;
 
-    @ManyToOne
-    @JoinColumn(name = "member_id")
-    private Member likingMember;
-
-    public Likes(Member likedMember, Member likingMember) {
-        this.likedMember = likedMember;
-        this.likingMember = likingMember;
-    }
+    private Long likingMember;    
 }
