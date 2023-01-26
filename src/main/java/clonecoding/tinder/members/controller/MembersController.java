@@ -31,8 +31,8 @@ public class MembersController {
         return membersService.getMember(userDetails.getMember().getPhoneNum(), requestDto);
     }
 
-    @PostMapping("/one")
-    public MembersResponseDto getMember(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody MemberFindRequestDto requestDto) {
-        return membersService.getMember(userDetails.getMember().getPhoneNum(), requestDto);
-    }
+//    @PostMapping("/one")
+//    public MembersResponseDto getMember(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody MemberFindRequestDto requestDto) {
+//        return membersService.getMember(userDetails.getMember().getPhoneNum(), requestDto);
+//    }
 }

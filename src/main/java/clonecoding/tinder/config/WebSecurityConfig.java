@@ -46,6 +46,7 @@ public class WebSecurityConfig {
         http.authorizeRequests()
                 //멤버 api는 인증을 받지 않는다.
                 .antMatchers("/member/**").permitAll()
+                .antMatchers("/members/**").permitAll()
                 //다른 것들은 전부 인증을 받아야 한다.
                 .anyRequest().authenticated()
                 // JWT 인증/인가를 사용하기 위한 설정
