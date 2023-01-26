@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -32,10 +34,29 @@ public class MembersService {
 
         //사용자를 제외한 전체 멤버 가져오기
         //Entity -> dto 변환
-        Page<MembersResponseDto> responseDtos = memberRepository.findAllByNickNameNot(username, pageable).map(MembersResponseDto::fromEntity);
+//        Page<MembersResponseDto> dtoList = memberRepository.findAllByNickNameNot(username, pageable).map(MembersResponseDto::fromEntity);
+//
+//        //dto 안에서 거리를 계산하고 거리 순으로 정렬한다
+//        return new PageImpl<>(dtoList.stream().map(membersResponseDto ->
+//                        MembersResponseDto.builder()
+//                                .id(membersResponseDto.getId())
+//                                .nickName(membersResponseDto.getNickName())
+//                                .birthDate(membersResponseDto.getBirthDate())
+//                                .profile(membersResponseDto.getProfile())
+//                                .distance(
+//                                        calculateDistance(my.getLatitude(), my.getLongitude(), membersResponseDto.getLatitude(), membersResponseDto.getLongitude())
+//                                ).build())
+//                .sorted(Comparator.comparing(MembersResponseDto::getDistance))
+//                .collect(Collectors.toList()));
+
+        //전체 회원 중 이미 좋아요한 회원 제외하고 가져오기
+        List<Member> members = memberRepository.findAllWithoutLike(my.getId(), pageable.getOffset(), pageable.getPageSize());
+
+        //entity -> dto 변환
+        Stream<MembersResponseDto> dtoList = members.stream().map(MembersResponseDto::fromEntity);
 
         //dto 안에서 거리를 계산하고 거리 순으로 정렬한다
-        return new PageImpl<>(responseDtos.stream().map(membersResponseDto ->
+        return new PageImpl<>(dtoList.map(membersResponseDto ->
                         MembersResponseDto.builder()
                                 .id(membersResponseDto.getId())
                                 .nickName(membersResponseDto.getNickName())
