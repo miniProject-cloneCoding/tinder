@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -18,15 +19,15 @@ import java.io.IOException;
 
 @Slf4j
 @RequiredArgsConstructor
-public class JwtAuthFilter {
+public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
 
 
 
-    public void setAuthentication(String username) {
+    public void setAuthentication(String phoneNum) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
-        Authentication authentication = jwtUtil.createAuthentication(username);
+        Authentication authentication = jwtUtil.createAuthentication(phoneNum);
         context.setAuthentication(authentication);
 
         SecurityContextHolder.setContext(context);
@@ -42,5 +43,21 @@ public class JwtAuthFilter {
         } catch (Exception e) {
             log.error(e.getMessage());
         }
+    }
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        String token = jwtUtil.resolveToken(request);
+
+        if(token != null) {
+            if(!jwtUtil.validateToken(token)){
+                jwtExceptionHandler(response, "토큰이 유효하지 않습니다.", HttpStatus.UNAUTHORIZED.value());
+                return;
+            }
+            Claims info = jwtUtil.getUserInfoFromToken(token);
+            //핸드폰번호를 가져옴
+            setAuthentication(info.getSubject());
+        }
+        filterChain.doFilter(request,response);
     }
 }
