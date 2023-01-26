@@ -12,5 +12,4 @@ public interface MemberRepository extends JpaRepository<Member, Long>, CustomMem
 
     Page<Member> findAllByNickNameNot(String nickName, Pageable pageable);
 
-    Optional<Member> findByNickName(String nickName);
 }

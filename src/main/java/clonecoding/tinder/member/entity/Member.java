@@ -23,17 +23,27 @@ public class Member {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false)
+//todo 주석풀기
+
+//    @Column(nullable = false)
     private String birthDate;
 
-    @Column(nullable = false)
+//    @Column(nullable = false)
     private String profile;
 
-    @Column(nullable = false)
+//    @Column(nullable = false)
     private String email;
 
     private double latitude;
     private double longitude;
 
     public Member() {}
+
+    public Member(String nickName, String phoneNum, String password, double latitude, double longitude) {
+        this.phoneNum = phoneNum;
+        this.nickName = nickName;
+        this.password = password;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
 }

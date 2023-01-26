@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Comparator;
 import java.util.List;
@@ -24,13 +25,30 @@ public class MembersService {
     private final MemberRepository memberRepository;
     private final JwtUtil jwtUtil;
 
+    @PostConstruct
+    public void init() {
+        Member member1 = new Member("member1", "011", "pass", 126.925205, 37.4787760); //소산
+        Member member2 = new Member("member2", "012", "pass", 126.923300, 37.5818396); //보노
+        Member member3 = new Member("member3", "013", "pass", 126.729566, 37.4928588); //인천
+        Member member4 = new Member("member4", "014", "pass", 127.028230, 37.5007549); //강남
+        Member member5 = new Member("member5", "015", "pass", 126.925386, 37.4788392); //문성로
+        Member member6 = new Member("member6", "016", "pass", 126.917397, 37.4749234); //난곡로
+
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+        memberRepository.save(member3);
+        memberRepository.save(member4);
+        memberRepository.save(member5);
+        memberRepository.save(member6);
+    }
+
     public Page<MembersResponseDto> getMembers(HttpServletRequest request, Pageable pageable) {
 
         // 토큰에서 사용자 이름 가져오기
         Claims claims = getClaims(request);
-        String username = claims.getSubject();
+        String phoneNum = claims.getSubject();
 
-        Member my = memberRepository.findByNickName(username).orElseThrow(() -> new IllegalArgumentException("로그인을 해주세요"));
+        Member my = memberRepository.findByPhoneNum(phoneNum).orElseThrow(() -> new IllegalArgumentException("로그인을 해주세요"));
 
         //사용자를 제외한 전체 멤버 가져오기
         //Entity -> dto 변환
@@ -72,6 +90,7 @@ public class MembersService {
 
     private Claims getClaims(HttpServletRequest request) {
         String token = jwtUtil.resolveToken(request);
+        log.info(token);
         return jwtUtil.getUserInfoFromToken(token);
     }
 
