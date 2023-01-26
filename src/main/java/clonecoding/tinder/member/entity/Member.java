@@ -25,10 +25,10 @@ public class Member {
 
 //todo 주석풀기
 
-//    @Column(nullable = false)
+    @Column(nullable = false)
     private String birthDate;
 
-//    @Column(nullable = false)
+    @Column(nullable = false)
     private String profile;
 
 //    @Column(nullable = false)
@@ -39,11 +39,13 @@ public class Member {
 
     public Member() {}
 
-    public Member(String nickName, String phoneNum, String password, double latitude, double longitude) {
+    public Member(String nickName, String phoneNum, String password, double latitude, double longitude, String birthDate, String profile) {
         this.phoneNum = phoneNum;
         this.nickName = nickName;
         this.password = password;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.birthDate = birthDate;
+        this.profile = profile;
     }
 }

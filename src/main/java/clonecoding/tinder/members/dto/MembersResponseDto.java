@@ -19,6 +19,7 @@ public class MembersResponseDto {
     private double latitude;
     private double longitude;
     private double distance;
+    private int age;
 
 
     public MembersResponseDto(Member member) {

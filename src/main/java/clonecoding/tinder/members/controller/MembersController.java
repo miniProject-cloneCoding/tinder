@@ -1,5 +1,6 @@
 package clonecoding.tinder.members.controller;
 
+import clonecoding.tinder.members.dto.MemberFindRequestDto;
 import clonecoding.tinder.members.dto.MembersResponseDto;
 import clonecoding.tinder.members.service.MembersService;
 import clonecoding.tinder.security.UserDetailsImpl;
@@ -22,6 +23,16 @@ public class MembersController {
     @GetMapping
     public Page<MembersResponseDto> getMembers(Pageable pageable, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         log.info("컨트롤러 실행");
-        return  membersService.getMembers(pageable, userDetails.getMember().getPhoneNum());
+        return membersService.getMembers(pageable, userDetails.getMember().getPhoneNum());
+    }
+
+    @GetMapping("/one")
+    public MembersResponseDto getFirstMember(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody MemberFindRequestDto requestDto) {
+        return membersService.getMember(userDetails.getMember().getPhoneNum(), requestDto);
+    }
+
+    @PostMapping("/one")
+    public MembersResponseDto getMember(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody MemberFindRequestDto requestDto) {
+        return membersService.getMember(userDetails.getMember().getPhoneNum(), requestDto);
     }
 }
