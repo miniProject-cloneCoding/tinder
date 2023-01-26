@@ -12,7 +12,6 @@ public class UserDetailsImpl implements UserDetails {
     private final String phoneNum;
 
     public UserDetailsImpl(Member member, String phoneNum) {
-
         this.member = member;
         this.phoneNum = phoneNum;
     }
@@ -24,6 +23,7 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+
         return null;
     }
 

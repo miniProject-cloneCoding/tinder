@@ -14,5 +14,10 @@ public class Likes {
 
     private Long likedMember;
 
-    private Long likingMember;    
+    private Long likingMember;
+
+    public Likes(Long likedMember, Long likingMember) {
+        this.likedMember = likedMember;
+        this.likingMember = likingMember;
+    }
 }

@@ -96,7 +96,7 @@ public class JwtUtil {
     // 인증 객체 생성
     public Authentication createAuthentication(String phoneNum) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(phoneNum);
-        return new UsernamePasswordAuthenticationToken(userDetails, null);
+        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 
 
