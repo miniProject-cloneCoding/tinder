@@ -39,7 +39,7 @@ public class LikeService {
             Member likedMember = memberRepository.findById(id).orElseThrow(
                     ()-> new IllegalArgumentException("존재하지 않는 유저입니다.")
             );
-            Likes likes = new Likes(likedMember,likingMember);
+            Likes likes = new Likes(likedMember.getId(),likingMember.getId());
             //db에 저장
             likeRepository.save(likes);
             return new LikeResponseDto("좋아요를 눌렀습니다.", HttpStatus.OK.value());
