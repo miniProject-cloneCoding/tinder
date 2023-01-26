@@ -35,7 +35,19 @@ public class WebSecurityConfig {
                 .requestMatchers(PathRequest.toH2Console())
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
-
+    private static final String[] PERMIT_URL_ARRAY = {
+            /* swagger v2 */
+            "/v2/api-docs",
+            "/swagger-resources",
+            "/swagger-resources/**",
+            "/configuration/ui",
+            "/configuration/security",
+            "/swagger-ui.html",
+            "/webjars/**",
+            /* swagger v3 */
+            "/v3/api-docs/**",
+            "/swagger-ui/**"
+    };
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf().disable();
@@ -47,6 +59,7 @@ public class WebSecurityConfig {
                 //멤버 api는 인증을 받지 않는다.
                 .antMatchers("/member/**").permitAll()
                 .antMatchers("/members/**").permitAll()
+                .antMatchers(PERMIT_URL_ARRAY).permitAll()
                 //다른 것들은 전부 인증을 받아야 한다.
                 .anyRequest().authenticated()
                 // JWT 인증/인가를 사용하기 위한 설정
