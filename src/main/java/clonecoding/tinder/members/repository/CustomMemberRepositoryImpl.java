@@ -40,19 +40,37 @@ public class CustomMemberRepositoryImpl implements CustomMemberRepository {
 //    }
 
     @Override
-    public List<Member> findAllWithoutLike(Long myId, int offset, int limit) {
+    public List<Member> findAllWithoutLike(Long myId, int offset, int limit, MemberSearch memberSearch) {
 
         //조회할 회원 중 나 자신은 제외하고, 내가 이미 좋아요 한 회원도 제외함
-        TypedQuery<Member> query = em.createQuery("select m from Member m where m.id != :myId and m.id not in " +
-                "(select l.likedMember from Likes l where l.likingMember = :myId2) ", Member.class);
+        String jpql = "select m from Member m where m.id != :myId and m.id not in " +
+                "(select l.likedMember from Likes l where l.likingMember = :myId2) ";
 
+        boolean isFirstCondition = true;
+
+        //내가 원하는 성별을 골라서 조회함(여자를 원하는 경우)
+        if (memberSearch.isFemale()) {
+            jpql += "and m.gender in (0";
+            isFirstCondition = false;
+        }
+
+        //남자를 원하는 경우
+        if (memberSearch.isMale()) {
+            if (isFirstCondition) {
+                jpql += "and m.gender in (1)";
+            } else { //남녀 둘다 원하는 경우
+                jpql += ", 1)";
+            }
+        } else {
+            jpql += ")";
+        }
+
+        log.info("getMember jpql = {} ", jpql);
+
+        TypedQuery<Member> query = em.createQuery(jpql, Member.class);
         //파라미터 바인딩
         query.setParameter("myId", myId);
         query.setParameter("myId2", myId);
-
-        //페이징 처리
-        query.setFirstResult(offset);
-        query.setMaxResults(limit);
 
         return query.getResultList();
     }
@@ -88,7 +106,5 @@ public class CustomMemberRepositoryImpl implements CustomMemberRepository {
         query.setParameter("myId2", myId);
 
         return query.getResultList();
-
-
     }
 }

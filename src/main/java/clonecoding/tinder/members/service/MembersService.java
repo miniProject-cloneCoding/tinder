@@ -77,9 +77,14 @@ public class MembersService {
 
         Member my = memberRepository.findByPhoneNum(phoneNum).orElseThrow(() -> new IllegalArgumentException("로그인을 해주세요"));
 
+        // 내가 원하는 성별 memberSearch 조건에 넣어주기
+        String[] split = my.getWantedGender().split(",");
+        log.info("내가 원하는 성별 = {}", Arrays.toString(split));
+        MemberSearch memberSearch = new MemberSearch(split);
+
         //전체 회원 중 이미 좋아요한 회원 제외하고 가져오기
         //파라미터 (내 아이디, 페이지번호, 페이지 사이즈)
-        List<Member> members = memberRepository.findAllWithoutLike(my.getId(), Long.valueOf(pageable.getOffset()).intValue(), pageable.getPageSize());
+        List<Member> members = memberRepository.findAllWithoutLike(my.getId(), Long.valueOf(pageable.getOffset()).intValue(), pageable.getPageSize(), memberSearch);
 
         //entity -> dto 변환
         Stream<MembersResponseDto> dtoList = members.stream().map(MembersResponseDto::fromEntity);
@@ -95,6 +100,12 @@ public class MembersService {
 
         //좋아요를 눌렀다면
         if (requestDto.isLike()) {
+
+            //좋아요 요청한 사람의 id가 존재하지 않는다면
+            if (memberRepository.findById(requestDto.getId()).isEmpty()) {
+                throw new IllegalArgumentException("존재하지 않는 회원입니다");
+            }
+
             //좋아요 테이블에 좋아요 기록 저장
             Likes likes = new Likes(requestDto.getId(), my.getId());
             likeRepository.save(likes);
