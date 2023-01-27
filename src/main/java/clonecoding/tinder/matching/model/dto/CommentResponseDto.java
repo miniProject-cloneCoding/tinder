@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class CommentResponseDto {
 
-    private Long sender;
+    private String sender;
     private String content;
     private LocalDateTime createdAt;
 }
