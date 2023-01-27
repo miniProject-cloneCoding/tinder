@@ -1,6 +1,5 @@
 package clonecoding.tinder.like.entity;
 
-import clonecoding.tinder.member.entity.Member;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;

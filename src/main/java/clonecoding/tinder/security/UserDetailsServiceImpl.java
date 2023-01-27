@@ -1,7 +1,7 @@
 package clonecoding.tinder.security;
 
-import clonecoding.tinder.member.entity.Member;
-import clonecoding.tinder.member.repository.MemberRepository;
+import clonecoding.tinder.members.entity.Member;
+import clonecoding.tinder.members.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

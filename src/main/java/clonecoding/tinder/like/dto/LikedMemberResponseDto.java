@@ -1,6 +1,6 @@
 package clonecoding.tinder.like.dto;
 
-import clonecoding.tinder.member.entity.Member;
+import clonecoding.tinder.members.entity.Member;
 import lombok.Getter;
 
 @Getter

@@ -1,4 +1,4 @@
-package clonecoding.tinder.member.entity;
+package clonecoding.tinder.members.entity;
 
 public enum MemberRoleEnum {
 
