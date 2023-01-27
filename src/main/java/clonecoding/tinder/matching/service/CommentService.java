@@ -8,11 +8,13 @@ import clonecoding.tinder.members.dto.MembersResponseDto;
 import clonecoding.tinder.members.entity.Member;
 import clonecoding.tinder.members.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CommentService {
@@ -20,7 +22,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final MemberRepository memberRepository;
 
-    //상대방과 나 사이의 모든 댓글 가져오기
+    //상대방과 내가 주고받은 모든 댓글 가져오기
     public List<CommentResponseDto> getComments(String phoneNum, CommentRequestDto requestDto) {
 
         Member my = findMember(phoneNum);
@@ -37,7 +39,9 @@ public class CommentService {
         comments.addAll(send);
         comments.addAll(received);
 
-        //서로 보낸 댓글들을 시간 순서대로 정렬하여 return
+        log.info("총 댓글 갯수는 = {}", comments.size());
+
+        //서로 보낸 댓글들을 작성일자 순서대로 정렬하여 return
         return comments.stream().map(comment -> CommentResponseDto.builder()
                 .sender(findNameById(comment.getSender(), my, oppositeMember))
                 .content(comment.getContent())
@@ -45,11 +49,6 @@ public class CommentService {
                 .build())
                 .sorted(Comparator.comparing(CommentResponseDto::getCreatedAt))
                 .collect(Collectors.toList());
-    }
-
-    private Member findOppositeMember(CommentRequestDto requestDto) {
-        return memberRepository.findById(requestDto.getOppositeMember()).orElseThrow(
-                () -> new IllegalArgumentException("일치하는 회원이 없습니다"));
     }
 
     //댓글 작성하기
@@ -60,6 +59,7 @@ public class CommentService {
 
         //상대방 정보 찾아오기
         Member oppositeMember = findOppositeMember(requestDto);
+        log.info("내가 댓글 보내는 상대방 id = {}", oppositeMember.getId());
 
         Comment comment = new Comment(requestDto.getContent(), my.getId(), requestDto.getOppositeMember());
         Comment savedComment = commentRepository.save(comment);
@@ -70,11 +70,10 @@ public class CommentService {
                 .build();
     }
 
-    private String findNameById(Long id, Member my, Member oppositeMember) {
-        if (Objects.equals(id, my.getId())) {
-            return my.getNickName();
-        }
-        return oppositeMember.getNickName();
+    //상대방 정보 찾기
+    private Member findOppositeMember(CommentRequestDto requestDto) {
+        return memberRepository.findById(requestDto.getOppositeMember()).orElseThrow(
+                () -> new IllegalArgumentException("일치하는 회원이 없습니다"));
     }
 
     //로그인한 사용자 정보 찾아오기
@@ -82,4 +81,11 @@ public class CommentService {
         return memberRepository.findByPhoneNum(phoneNum).orElseThrow(() -> new IllegalArgumentException("로그인을 해주세요"));
     }
 
+    //나와 상대방의 id를 가지고 nickName 반환
+    private String findNameById(Long id, Member my, Member oppositeMember) {
+        if (Objects.equals(id, my.getId())) {
+            return my.getNickName();
+        }
+        return oppositeMember.getNickName();
+    }
 }

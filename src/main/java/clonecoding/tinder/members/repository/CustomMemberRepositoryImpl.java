@@ -39,7 +39,7 @@ public class CustomMemberRepositoryImpl implements CustomMemberRepository {
 //                .fetch();
 //    }
 
-    @Override
+    @Override //전체 조회하기
     public List<Member> findAllWithoutLike(Long myId, int offset, int limit, MemberSearch memberSearch) {
 
         //조회할 회원 중 나 자신은 제외하고, 내가 이미 좋아요 한 회원도 제외함
@@ -68,6 +68,7 @@ public class CustomMemberRepositoryImpl implements CustomMemberRepository {
         log.info("getMember jpql = {} ", jpql);
 
         TypedQuery<Member> query = em.createQuery(jpql, Member.class);
+
         //파라미터 바인딩
         query.setParameter("myId", myId);
         query.setParameter("myId2", myId);
@@ -75,7 +76,7 @@ public class CustomMemberRepositoryImpl implements CustomMemberRepository {
         return query.getResultList();
     }
 
-    @Override
+    @Override //페이징 없이 전체 조회하기
     public List<Member> findAllWithoutPaging(Long myId, MemberSearch memberSearch) {
 
         String jpql = "select m from Member m where m.id != :myId and m.id not in " +
@@ -83,15 +84,16 @@ public class CustomMemberRepositoryImpl implements CustomMemberRepository {
 
         boolean isFirstCondition = true;
 
+        //내가 원하는 성별을 골라서 조회함(여자를 원하는 경우)
         if (memberSearch.isFemale()) {
             jpql += "and m.gender in (0";
             isFirstCondition = false;
         }
 
-        if (memberSearch.isMale()) {
+        if (memberSearch.isMale()) { //남자를 원하는 경우
             if (isFirstCondition) {
                 jpql += "and m.gender in (1)";
-            } else {
+            } else { //남녀 모두 원하는 경우
                 jpql += ", 1)";
             }
         } else {

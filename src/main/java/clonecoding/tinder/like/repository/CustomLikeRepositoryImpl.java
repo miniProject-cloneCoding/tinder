@@ -14,7 +14,7 @@ public class CustomLikeRepositoryImpl implements CustomLikeRepository{
     @PersistenceContext
     private final EntityManager em;
 
-    @Override
+    @Override //내가 좋아요 누른 리스트
     public List<Likes> findMyLiking(Long myId) {
         TypedQuery<Likes> query = em.createQuery("select l from Likes l where l.likingMember = :myId", Likes.class);
 
@@ -23,7 +23,7 @@ public class CustomLikeRepositoryImpl implements CustomLikeRepository{
         return query.getResultList();
     }
 
-    @Override
+    @Override //내가 좋아요 받은 리스트
     public List<Likes> findMyLiked(Long myId) {
         TypedQuery<Likes> query = em.createQuery("select l from Likes l where l.likedMember = :myId", Likes.class);
 

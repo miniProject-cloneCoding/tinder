@@ -27,12 +27,13 @@ public class MatchingService {
     //나와 매칭된 회원들 보여주기
     public List<MembersResponseDto> getMatching(String phoneNum) {
 
+        //내 정보 가져오기
         Member my = findMember(phoneNum);
 
-        //내가 좋아요 한 경우
+        //내가 좋아요 한 Likes 리스트
         List<Likes> likingList = likeRepository.findMyLiking(my.getId());
 
-        //좋아요 한게 없다면 return
+        //좋아요 하나도 안 한 경우
         if (likingList.size() == 0) {
             return null;
         }
@@ -46,14 +47,14 @@ public class MatchingService {
         //내가 좋아요 받은 경우
         List<Likes> likedList = likeRepository.findMyLiked(my.getId());
 
-        //좋아요 받은게 없다면 return
+        //좋아요 받은게 한 개도 없다면 return
         if (likedList.size() == 0) {
             return null;
         }
 
         //좋아요 한 사람과 좋아요 받은 사람의 값을 서로 바꿔서 dto에 저장한다
-        // -> 이렇게하면 내 id는 모두 likingMember 안에 들어가게 된다
-        // -> 따라서 dto의 EqualsAndHashcode 를 사용하여 상호간에 매칭되었는지 여부를 확인할 수 있게 된다
+        // -> 이렇게하면 내 id는 liking과 liked 모두 likingMember 안에 들어가게 된다
+        // -> 따라서 dto의 EqualsAndHashcode 를 사용하여 상호간에 매칭되었는지(일치) 여부를 확인할 수 있게 된다
         List<MatchingDto> likedDto = likedList.stream().map(likes ->
                 MatchingDto.builder()
                         .likedMember(likes.getLikingMember())
@@ -70,6 +71,7 @@ public class MatchingService {
 
                 log.info("liked 들어갈 정보 = {}", liked.getLikingMember());
                 log.info("liked 들어갈 정보 = {}", liked.getLikedMember());
+
                 //내가 좋아요 한 회원이 나에게도 좋아요 한 경우에 회원 아이디를 저장함
                 if (liking.equals(liked)) {
                     matchingIds.add(liking.getLikedMember());
