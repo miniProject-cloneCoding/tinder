@@ -13,7 +13,7 @@ import java.util.Objects;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Likes {
+public class Likes extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -9,6 +9,7 @@ import clonecoding.tinder.members.dto.MemberSignupRequestDto;
 import clonecoding.tinder.members.entity.Member;
 import clonecoding.tinder.members.repository.MemberRepository;
 import clonecoding.tinder.members.dto.MemberFindRequestDto;
+import clonecoding.tinder.members.dto.MemberSearch;
 import clonecoding.tinder.members.dto.MembersResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,12 +40,15 @@ public class MembersService {
     //초기데이터 todo 삭제할 것
 //    @PostConstruct
     public void init() {
-        Member member1 = new Member("member1", "011", "pass", 126.925205, 37.4787760, "930206", "https://cdn.pixabay.com/photo/2017/08/06/12/52/woman-2592247_960_720.jpg"); //소산
-        Member member2 = new Member("member2", "012", "pass", 126.923300, 37.5818396, "000123", "https://cdn.pixabay.com/photo/2017/08/06/12/52/woman-2592247_960_720.jpg"); //보노
-        Member member3 = new Member("member3", "013", "pass", 126.729566, 37.4928588, "980703", "https://cdn.pixabay.com/photo/2017/08/06/12/52/woman-2592247_960_720.jpg"); //인천
-        Member member4 = new Member("member4", "014", "pass", 127.028230, 37.5007549, "650403", "https://cdn.pixabay.com/photo/2017/08/06/12/52/woman-2592247_960_720.jpg"); //강남
-        Member member5 = new Member("member5", "015", "pass", 126.925386, 37.4788392, "850519", "https://cdn.pixabay.com/photo/2017/08/06/12/52/woman-2592247_960_720.jpg"); //문성로
-        Member member6 = new Member("member6", "016", "pass", 126.917397, 37.4749234, "990818", "https://cdn.pixabay.com/photo/2017/08/06/12/52/woman-2592247_960_720.jpg"); //난곡로
+        Member member1 = new Member("member1", "011", "pass", 126.925205, 37.4787760, "930206", "https://cdn.pixabay.com/photo/2017/08/06/12/52/woman-2592247_960_720.jpg", 0, "0,1"); //소산
+        Member member2 = new Member("member2", "012", "pass", 126.923300, 37.5818396, "000123", "https://cdn.pixabay.com/photo/2017/08/06/12/52/woman-2592247_960_720.jpg", 0, "1"); //보노
+        Member member3 = new Member("member3", "013", "pass", 126.729566, 37.4928588, "980703", "https://cdn.pixabay.com/photo/2017/08/06/12/52/woman-2592247_960_720.jpg", 0, "1"); //인천
+        Member member4 = new Member("member4", "014", "pass", 127.028230, 37.5007549, "650403", "https://cdn.pixabay.com/photo/2017/08/06/12/52/woman-2592247_960_720.jpg", 1, "0"); //강남
+        Member member5 = new Member("member5", "015", "pass", 126.925386, 37.4788392, "850519", "https://cdn.pixabay.com/photo/2017/08/06/12/52/woman-2592247_960_720.jpg", 1, "0"); //문성로
+        Member member6 = new Member("member6", "016", "pass", 126.917397, 37.4749234, "990818", "https://cdn.pixabay.com/photo/2017/08/06/12/52/woman-2592247_960_720.jpg", 1, "0"); //난곡로
+        Member member7 = new Member("member7", "017", "pass", 127.028230, 37.5007549, "650403", "https://cdn.pixabay.com/photo/2017/08/06/12/52/woman-2592247_960_720.jpg", 1, "0"); //강남
+        Member member8 = new Member("member8", "018", "pass", 126.925386, 37.4788392, "850519", "https://cdn.pixabay.com/photo/2017/08/06/12/52/woman-2592247_960_720.jpg", 1, "0"); //문성로
+        Member member9 = new Member("member9", "019", "pass", 126.917397, 37.4749234, "990818", "https://cdn.pixabay.com/photo/2017/08/06/12/52/woman-2592247_960_720.jpg", 1, "0"); //난곡로
 
         memberRepository.save(member1);
         memberRepository.save(member2);
@@ -52,9 +56,14 @@ public class MembersService {
         memberRepository.save(member4);
         memberRepository.save(member5);
         memberRepository.save(member6);
+        memberRepository.save(member7);
+        memberRepository.save(member8);
+        memberRepository.save(member9);
 
         Likes likes = new Likes(member5.getId(), member1.getId());
         likeRepository.save(likes);
+        Likes likes2 = new Likes(member1.getId(), member5.getId());
+        likeRepository.save(likes2);
     }
 
     //API가 호출 될 때마다 회원 한 명씩 반환하기 위한 List
@@ -78,9 +87,7 @@ public class MembersService {
         return new PageImpl<>(sortDto(my, dtoList));
     }
 
-
-
-
+    //추천회원 한명 조회하기
     public MembersResponseDto getMember(String phoneNum, MemberFindRequestDto requestDto) {
 
         Member my = memberRepository.findByPhoneNum(phoneNum).orElseThrow(() -> new IllegalArgumentException("로그인을 해주세요"));
@@ -104,9 +111,15 @@ public class MembersService {
             count = 0; //다시 0부터 카운트 시작
         }
 
-        //전체 회원 중 이미 좋아요한 회원 제외하고 가져오기
-        //파라미터 (내 아이디, 페이지번호, 페이지 사이즈)
-        List<Member> members = memberRepository.findAllWithoutPaging(my.getId());
+        //todo 내가 원하는 성별 memberSearch 조건에 넣어주기
+        String[] split = my.getWantedGender().split(",");
+        log.info("내가 원하는 성별 = {}", Arrays.toString(split));
+        MemberSearch memberSearch = new MemberSearch(split);
+
+        //전체 회원 중 이미 좋아요한 회원 제외하고, 내가 원하는 성별만 가져오기
+        //파라미터 (내 아이디, 성별검색조건)
+        List<Member> members = memberRepository.findAllWithoutPaging(my.getId(), memberSearch);
+        log.info("조회한 회원 list 사이즈는 = {}", members.size());
 
         //entity -> dto 변환
         Stream<MembersResponseDto> dtoList = members.stream().map(MembersResponseDto::fromEntity);
@@ -118,6 +131,7 @@ public class MembersService {
         membersResponseDtoList.stream().map(membersResponseDto -> map.put(membersResponseDto.getId(), membersResponseDto));
 
         //api 호출 시마다 count++하여 dto에서 순차적으로 회원을 조회한다
+        log.info("회원 조회 카운트 = {} ", count);
         return membersResponseDtoList.get(count++);
     }
 

@@ -44,4 +44,12 @@ public class LikeController {
     public List<LikedMemberResponseDto> getLikedMembers(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         return likeService.getLikedMembers(userDetails.getMember());
     }
+
+    //좋아요 랭킹
+    @GetMapping("/like/ranking")
+    @ApiOperation(value = "좋아요한 사람 리스트 주기", notes = "좋아요 누른 사람들 전체 리스트를 돌려준다!")
+    @ApiImplicitParam(name = "authorization", value = "authorization", required = true, dataType = "string", paramType = "header")
+    public List<LikedMemberResponseDto> getRanking() {
+        return likeService.getRanking();
+    }
 }
