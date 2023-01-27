@@ -36,14 +36,14 @@ public class LikeService {
             Likes likes = new Likes(likedMember.getId(),likingMember.getId());
             //db에 저장
             likeRepository.save(likes);
-            if(rankingRepository.findByLikedMember(likedMember.getId()) == null) {
+            //좋아요가 눌린적 없다면
+            if(rankingRepository.findByLikedMember(likedMember.getId()).isEmpty()) {
                 Ranking ranking = new Ranking(likedMember.getId());
                 rankingRepository.save(ranking);
             }else{
-               Ranking ranking = rankingRepository.findByLikedMember(likedMember.getId()).orElseThrow(
-                       ()-> new IllegalArgumentException("좋아요가 눌린 적 없는 사용자입니다.")
-               );
-                ranking.liked();
+                // 좋아요가 눌렸었으면
+               Optional<Ranking> ranking = rankingRepository.findByLikedMember(likedMember.getId());
+                ranking.ifPresent(Ranking::liked);
             }
             return new LikeResponseDto("좋아요를 눌렀습니다.", HttpStatus.OK.value());
         }
@@ -80,7 +80,7 @@ public class LikeService {
     }
     // 하루동안 좋아요를 가장 많이 받은 top5 가져오기
     public List<LikedMemberResponseDto> getRanking() {
-        List<Ranking> rankings = rankingRepository.findTop3ByOrderByCount();
+        List<Ranking> rankings = rankingRepository.findTop3ByOrderByCountDesc();
         List<LikedMemberResponseDto> dtoList = new ArrayList<>();
         for(Ranking ranking : rankings) {
             Member likedMember = memberRepository.findById(ranking.getLikedMember()).orElseThrow(
