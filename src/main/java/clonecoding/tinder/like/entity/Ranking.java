@@ -1,28 +1,32 @@
 package clonecoding.tinder.like.entity;
 
-import jdk.jfr.Timestamp;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.sql.Time;
 
 @Entity
 @NoArgsConstructor
-public class Likes extends Timestamped {
+@Getter
+public class Ranking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private Long likedMember;
 
-    private Long likingMember;
+    @Column(nullable = false)
+    private int count =1;
 
-    public Likes(Long likedMember, Long likingMember) {
+    public Ranking(Long likedMember) {
         this.likedMember = likedMember;
-        this.likingMember = likingMember;
     }
 
-    public Long getLikedMember() {
-        return likedMember;
+    public void liked() {
+        this.count +=1;
+    }
+    public void disLiked() {
+        this.count -=1;
     }
 }
