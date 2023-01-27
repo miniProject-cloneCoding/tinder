@@ -10,9 +10,7 @@ import clonecoding.tinder.members.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,6 +24,7 @@ public class CommentService {
     public List<CommentResponseDto> getComments(String phoneNum, CommentRequestDto requestDto) {
 
         Member my = findMember(phoneNum);
+        Member oppositeMember = findOppositeMember(requestDto);
 
         //내가 상대방에게 쓴 댓글 가져오기
         List<Comment> send = commentRepository.findAllBySenderAndReceiver(my.getId(), requestDto.getOppositeMember());
@@ -40,7 +39,7 @@ public class CommentService {
 
         //서로 보낸 댓글들을 시간 순서대로 정렬하여 return
         return comments.stream().map(comment -> CommentResponseDto.builder()
-                .sender(comment.getSender())
+                .sender(findNameById(comment.getSender(), my, oppositeMember))
                 .content(comment.getContent())
                 .createdAt(comment.getCreatedAt())
                 .build())
@@ -48,17 +47,34 @@ public class CommentService {
                 .collect(Collectors.toList());
     }
 
+    private Member findOppositeMember(CommentRequestDto requestDto) {
+        return memberRepository.findById(requestDto.getOppositeMember()).orElseThrow(
+                () -> new IllegalArgumentException("일치하는 회원이 없습니다"));
+    }
+
     //댓글 작성하기
     public CommentResponseDto createComments(String phoneNum, CommentRequestDto requestDto) {
+
+        //내 정보 찾아오기
         Member my = findMember(phoneNum);
+
+        //상대방 정보 찾아오기
+        Member oppositeMember = findOppositeMember(requestDto);
 
         Comment comment = new Comment(requestDto.getContent(), my.getId(), requestDto.getOppositeMember());
         Comment savedComment = commentRepository.save(comment);
         return CommentResponseDto.builder()
-                .sender(savedComment.getSender())
+                .sender(findNameById(savedComment.getSender(), my, oppositeMember))
                 .content(savedComment.getContent())
                 .createdAt(savedComment.getCreatedAt())
                 .build();
+    }
+
+    private String findNameById(Long id, Member my, Member oppositeMember) {
+        if (Objects.equals(id, my.getId())) {
+            return my.getNickName();
+        }
+        return oppositeMember.getNickName();
     }
 
     //로그인한 사용자 정보 찾아오기
