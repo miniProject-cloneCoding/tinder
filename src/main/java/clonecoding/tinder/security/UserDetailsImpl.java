@@ -1,7 +1,6 @@
 package clonecoding.tinder.security;
 
-import clonecoding.tinder.member.entity.Member;
-import clonecoding.tinder.member.entity.MemberRoleEnum;
+import clonecoding.tinder.members.entity.Member;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 

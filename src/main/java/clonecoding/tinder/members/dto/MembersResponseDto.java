@@ -1,6 +1,6 @@
 package clonecoding.tinder.members.dto;
 
-import clonecoding.tinder.member.entity.Member;
+import clonecoding.tinder.members.entity.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

@@ -1,6 +1,6 @@
 package clonecoding.tinder.jwt;
 
-import clonecoding.tinder.member.dto.SecurityExceptionDto;
+import clonecoding.tinder.members.dto.SecurityExceptionDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
