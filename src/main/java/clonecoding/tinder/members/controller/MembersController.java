@@ -1,5 +1,8 @@
 package clonecoding.tinder.members.controller;
 
+import clonecoding.tinder.members.dto.MemberLoginRequestDto;
+import clonecoding.tinder.members.dto.MemberResponseMsgDto;
+import clonecoding.tinder.members.dto.MemberSignupRequestDto;
 import clonecoding.tinder.members.dto.MemberFindRequestDto;
 import clonecoding.tinder.members.dto.MembersResponseDto;
 import clonecoding.tinder.members.service.MembersService;
@@ -11,6 +14,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
 
 @Slf4j
 @RestController
@@ -33,6 +38,17 @@ public class MembersController {
     @GetMapping("/one")
     public MembersResponseDto getFirstMember(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody MemberFindRequestDto requestDto) {
         return membersService.getMember(userDetails.getMember().getPhoneNum(), requestDto);
+    }
+
+    @PostMapping("/signup")
+    public MemberResponseMsgDto signup(@RequestBody MemberSignupRequestDto memberSignupRequestDto, HttpServletResponse response) {
+        return membersService.signup(memberSignupRequestDto, response);
+    }
+
+    @PostMapping("/login")
+    public MemberResponseMsgDto login(@RequestBody MemberLoginRequestDto memberLoginRequestDto, HttpServletResponse response) {
+        log.info("login 컨트롤러 실행 {}, {}", memberLoginRequestDto.getPhoneNum(), memberLoginRequestDto.getPassword());
+        return membersService.login(memberLoginRequestDto, response);
     }
 
 //    @PostMapping("/one")

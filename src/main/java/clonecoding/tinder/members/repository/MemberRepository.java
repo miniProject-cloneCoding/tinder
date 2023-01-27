@@ -1,8 +1,6 @@
-package clonecoding.tinder.member.repository;
+package clonecoding.tinder.members.repository;
 
-import clonecoding.tinder.member.entity.Member;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import clonecoding.tinder.members.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

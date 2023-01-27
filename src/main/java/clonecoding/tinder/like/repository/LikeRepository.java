@@ -1,7 +1,6 @@
 package clonecoding.tinder.like.repository;
 
 import clonecoding.tinder.like.entity.Likes;
-import clonecoding.tinder.member.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
