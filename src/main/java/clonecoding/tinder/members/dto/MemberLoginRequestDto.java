@@ -1,4 +1,4 @@
-package clonecoding.tinder.member.dto;
+package clonecoding.tinder.members.dto;
 
 import lombok.Getter;
 

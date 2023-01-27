@@ -1,6 +1,6 @@
-package clonecoding.tinder.member.repository;
+package clonecoding.tinder.members.repository;
 
-import clonecoding.tinder.member.entity.Member;
+import clonecoding.tinder.members.entity.Member;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
