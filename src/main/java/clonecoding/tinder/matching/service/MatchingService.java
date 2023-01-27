@@ -8,6 +8,7 @@ import clonecoding.tinder.members.dto.MembersResponseDto;
 import clonecoding.tinder.members.entity.Member;
 import clonecoding.tinder.members.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MatchingService {
@@ -62,8 +64,12 @@ public class MatchingService {
         List<Long> matchingIds = new ArrayList<>();
 
         for (MatchingDto liking : likingDto) {
+            log.info("liking에 들어갈 정보 = {}", liking.getLikingMember());
+            log.info("liking에 들어갈 정보 = {}", liking.getLikedMember());
             for (MatchingDto liked : likedDto) {
 
+                log.info("liked 들어갈 정보 = {}", liked.getLikingMember());
+                log.info("liked 들어갈 정보 = {}", liked.getLikedMember());
                 //내가 좋아요 한 회원이 나에게도 좋아요 한 경우에 회원 아이디를 저장함
                 if (liking.equals(liked)) {
                     matchingIds.add(liking.getLikedMember());
@@ -71,6 +77,7 @@ public class MatchingService {
                 }
             }
         }
+        log.info("나와 매칭된 사람의 숫자는 = {}",matchingIds.size());
 
         //매칭된 회원들의 id를 가지고 member를 검색해온다
         return memberRepository.findAllById(matchingIds).stream().map(member ->
