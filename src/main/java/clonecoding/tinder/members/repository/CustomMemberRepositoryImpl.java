@@ -1,7 +1,7 @@
 package clonecoding.tinder.members.repository;
 
-import clonecoding.tinder.member.entity.Member;
 import clonecoding.tinder.members.dto.MemberSearch;
+import clonecoding.tinder.members.entity.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
