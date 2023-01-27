@@ -31,7 +31,7 @@ public class LikeController {
         return likeService.like(id,userDetails.getMember());
     }
     //좋아요 취소하기
-    @PatchMapping("/dislike/{id}")
+    @PatchMapping("dislike/{id}")
     @ApiOperation(value = "좋아요 취소", notes = "좋아요 누른 사람 좋아요 취소하기!")
     @ApiImplicitParam(name = "authorization", value = "authorization", required = true, dataType = "string", paramType = "header")
     public LikeResponseDto dislike(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -46,7 +46,7 @@ public class LikeController {
     }
 
     //좋아요 랭킹
-    @GetMapping("/like/ranking")
+    @GetMapping("like/ranking")
     @ApiOperation(value = "좋아요한 사람 리스트 주기", notes = "좋아요 누른 사람들 전체 리스트를 돌려준다!")
     @ApiImplicitParam(name = "authorization", value = "authorization", required = true, dataType = "string", paramType = "header")
     public List<LikedMemberResponseDto> getRanking() {
