@@ -80,7 +80,7 @@ public class LikeService {
     }
     // 하루동안 좋아요를 가장 많이 받은 top5 가져오기
     public List<LikedMemberResponseDto> getRanking() {
-        List<Ranking> rankings = rankingRepository.findTop3ByOrderByCount();
+        List<Ranking> rankings = rankingRepository.findTop3ByOrderByCountDesc();
         List<LikedMemberResponseDto> dtoList = new ArrayList<>();
         for(Ranking ranking : rankings) {
             Member likedMember = memberRepository.findById(ranking.getLikedMember()).orElseThrow(

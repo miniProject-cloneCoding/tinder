@@ -10,5 +10,5 @@ import java.util.Optional;
 public interface RankingRepository extends JpaRepository<Ranking, Long> {
     Optional<Ranking> findByLikedMember(Long LikedMember);
 
-    List<Ranking> findTop3ByOrderByCount();
+    List<Ranking> findTop3ByOrderByCountDesc();
 }
