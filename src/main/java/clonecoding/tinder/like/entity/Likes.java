@@ -1,12 +1,17 @@
 package clonecoding.tinder.like.entity;
 
-import jdk.jfr.Timestamp;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.Hibernate;
 
-import javax.persistence.*;
-import java.sql.Time;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import java.util.Objects;
 
 @Entity
+@Getter
 @NoArgsConstructor
 public class Likes extends Timestamped {
     @Id
@@ -25,4 +30,5 @@ public class Likes extends Timestamped {
     public Long getLikedMember() {
         return likedMember;
     }
+
 }
