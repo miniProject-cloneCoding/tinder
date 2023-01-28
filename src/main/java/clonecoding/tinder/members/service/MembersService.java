@@ -150,9 +150,7 @@ public class MembersService {
             map 안에 정보가 없다면 -> DB에서 조회하기
          */
         //내가 원하는 성별 memberSearch 조건에 넣어주기
-        String[] split = my.getWantedGender().split(",");
-        log.info("내가 원하는 성별 = {}", Arrays.toString(split));
-        MemberSearch memberSearch = new MemberSearch(split);
+        MemberSearch memberSearch = new MemberSearch(my.isWantingMale(), my.isWantingFemale());
 
         //전체 회원 중 이미 좋아요한 회원 제외하고, 내가 원하는 성별만 가져오기
         //파라미터 (내 아이디, 성별검색조건)
