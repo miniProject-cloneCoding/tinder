@@ -6,7 +6,9 @@ import clonecoding.tinder.matching.model.dto.CommentResponseDto;
 import clonecoding.tinder.matching.repository.CommentRepository;
 import clonecoding.tinder.members.dto.MembersResponseDto;
 import clonecoding.tinder.members.entity.Member;
+import clonecoding.tinder.members.repository.MemberRedisRepository;
 import clonecoding.tinder.members.repository.MemberRepository;
+import clonecoding.tinder.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,7 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final MemberRepository memberRepository;
+    private final MemberRedisRepository redisRepository;
 
     //상대방과 내가 주고받은 모든 댓글 가져오기
     public List<CommentResponseDto> getComments(String phoneNum, CommentRequestDto requestDto) {
@@ -76,9 +79,14 @@ public class CommentService {
                 () -> new IllegalArgumentException("일치하는 회원이 없습니다"));
     }
 
-    //로그인한 사용자 정보 찾아오기
+    //로그인한 내 정보를 phoneNum 으로 찾아오기 (Redis에서 먼저 검색 후 없으면 DB 접근)
     private Member findMember(String phoneNum) {
-        return memberRepository.findByPhoneNum(phoneNum).orElseThrow(() -> new IllegalArgumentException("로그인을 해주세요"));
+        UserDetailsImpl member = redisRepository.getUser(phoneNum).orElseGet(
+                () -> memberRepository.findByPhoneNum(phoneNum).map(UserDetailsImpl::fromEntity).orElseThrow(
+                        () -> new IllegalArgumentException("로그인을 해주세요.")
+                ));
+
+        return member.getMember();
     }
 
     //나와 상대방의 id를 가지고 nickName 반환

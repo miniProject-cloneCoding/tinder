@@ -6,7 +6,9 @@ import clonecoding.tinder.like.repository.LikeRepository;
 import clonecoding.tinder.matching.model.dto.MatchingDto;
 import clonecoding.tinder.members.dto.MembersResponseDto;
 import clonecoding.tinder.members.entity.Member;
+import clonecoding.tinder.members.repository.MemberRedisRepository;
 import clonecoding.tinder.members.repository.MemberRepository;
+import clonecoding.tinder.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,7 @@ public class MatchingService {
 
     private final MemberRepository memberRepository;
     private final LikeRepository likeRepository;
+    private final MemberRedisRepository redisRepository;
 
     //나와 매칭된 회원들 보여주기
     public List<MembersResponseDto> getMatching(String phoneNum) {
@@ -92,9 +95,14 @@ public class MatchingService {
                         .build()).collect(Collectors.toList());
     }
 
-    //로그인한 사용자 정보 찾아오기
+    //로그인한 내 정보를 phoneNum 으로 찾아오기 (Redis에서 먼저 검색 후 없으면 DB 접근)
     private Member findMember(String phoneNum) {
-        return memberRepository.findByPhoneNum(phoneNum).orElseThrow(() -> new IllegalArgumentException("로그인을 해주세요"));
+        UserDetailsImpl member = redisRepository.getUser(phoneNum).orElseGet(
+                () -> memberRepository.findByPhoneNum(phoneNum).map(UserDetailsImpl::fromEntity).orElseThrow(
+                        () -> new IllegalArgumentException("로그인을 해주세요.")
+                ));
+
+        return member.getMember();
     }
 
     //생년월일에서 나이 가져오기
