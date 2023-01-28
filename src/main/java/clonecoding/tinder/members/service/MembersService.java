@@ -7,12 +7,15 @@ import clonecoding.tinder.members.dto.MemberLoginRequestDto;
 import clonecoding.tinder.members.dto.MemberResponseMsgDto;
 import clonecoding.tinder.members.dto.MemberSignupRequestDto;
 import clonecoding.tinder.members.entity.Member;
+import clonecoding.tinder.members.repository.MemberRedisRepository;
 import clonecoding.tinder.members.repository.MemberRepository;
 import clonecoding.tinder.members.dto.MemberFindRequestDto;
 import clonecoding.tinder.members.dto.MemberSearch;
 import clonecoding.tinder.members.dto.MembersResponseDto;
+import clonecoding.tinder.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,6 +40,14 @@ public class MembersService {
     private final PasswordEncoder passwordEncoder;
 
     private final JwtUtil jwtUtil;
+    private final MemberRedisRepository redisRepository;
+
+    @Value("${jwt.secret.key}")
+    private String secretKey;
+
+    @Value("${jwt.token.expired-time-ms}")
+    private Long expiredTimeMs;
+
 
     //초기데이터 todo 삭제할 것
 //    @PostConstruct
@@ -75,7 +86,7 @@ public class MembersService {
     //회원 페이징하여 조회하기
     public Page<MembersResponseDto> getMembers(Pageable pageable, String phoneNum) {
 
-        Member my = memberRepository.findByPhoneNum(phoneNum).orElseThrow(() -> new IllegalArgumentException("로그인을 해주세요"));
+        Member my = findMember(phoneNum);
 
         // 내가 원하는 성별 memberSearch 조건에 넣어주기
         String[] split = my.getWantedGender().split(",");
@@ -96,7 +107,7 @@ public class MembersService {
     //추천회원 한명 조회하기
     public MembersResponseDto getMember(String phoneNum, MemberFindRequestDto requestDto) {
 
-        Member my = memberRepository.findByPhoneNum(phoneNum).orElseThrow(() -> new IllegalArgumentException("로그인을 해주세요"));
+        Member my = findMember(phoneNum);
 
         //좋아요를 눌렀다면
         if (requestDto.isLike()) {
@@ -289,10 +300,13 @@ public class MembersService {
         String phoneNum = memberLoginRequestDto.getPhoneNum();
         String password = memberLoginRequestDto.getPassword();
 
-        //사용자 확인
-        Member member = memberRepository.findByPhoneNum(phoneNum).orElseThrow(
-                () -> new IllegalArgumentException("등록된 사용자가 없습니다.")
-        );
+        //사용자 확인 - 레디스에서 먼저 가져오고 없으면 DB 조회
+        UserDetailsImpl member = redisRepository.getUser(phoneNum).orElseGet(
+                () -> memberRepository.findByPhoneNum(phoneNum).map(UserDetailsImpl::fromEntity).orElseThrow(
+                        () -> new IllegalArgumentException("등록된 사용자가 없습니다.")
+                ));
+
+        redisRepository.setUser(member);
 
         //비밀번호 확인
 //        if (!passwordEncoder.matches(password, member.getPassword())) {
@@ -304,5 +318,15 @@ public class MembersService {
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(member.getPhoneNum()));
 
         return new MemberResponseMsgDto("로그인 완료.", HttpStatus.OK.value());
+    }
+
+    //로그인한 내 정보 찾아오기 (Redis에서 먼저 검색 후 없으면 DB 접근)
+    private Member findMember(String phoneNum) {
+        UserDetailsImpl member = redisRepository.getUser(phoneNum).orElseGet(
+                () -> memberRepository.findByPhoneNum(phoneNum).map(UserDetailsImpl::fromEntity).orElseThrow(
+                        () -> new IllegalArgumentException("로그인을 해주세요.")
+                ));
+
+        return member.getMember();
     }
 }
