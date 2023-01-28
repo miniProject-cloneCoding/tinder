@@ -1,4 +1,4 @@
-package hanghae.fleamarket.exception;
+package clonecoding.tinder.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

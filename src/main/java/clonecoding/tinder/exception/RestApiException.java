@@ -1,4 +1,4 @@
-package hanghae.fleamarket.exception;
+package clonecoding.tinder.exception;
 
 import lombok.Getter;
 import lombok.Setter;
