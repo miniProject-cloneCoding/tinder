@@ -6,9 +6,12 @@ import clonecoding.tinder.like.entity.Likes;
 import clonecoding.tinder.like.entity.Ranking;
 import clonecoding.tinder.like.repository.LikeRepository;
 import clonecoding.tinder.like.repository.RankingRepository;
+import clonecoding.tinder.matching.model.Room;
+import clonecoding.tinder.matching.repository.RoomRepository;
 import clonecoding.tinder.members.entity.Member;
 import clonecoding.tinder.members.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,12 +21,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class LikeService {
     private final MemberRepository memberRepository;
     private final LikeRepository likeRepository;
     private final RankingRepository rankingRepository;
+    private final RoomRepository roomRepository;
 
     //좋아요
     @Transactional
@@ -36,6 +41,7 @@ public class LikeService {
             Likes likes = new Likes(likedMember.getId(),likingMember.getId());
             //db에 저장
             likeRepository.save(likes);
+
             //좋아요가 눌린적 없다면
             if(rankingRepository.findByLikedMember(likedMember.getId()).isEmpty()) {
                 Ranking ranking = new Ranking(likedMember.getId());
@@ -45,8 +51,25 @@ public class LikeService {
                Optional<Ranking> ranking = rankingRepository.findByLikedMember(likedMember.getId());
                 ranking.ifPresent(Ranking::liked);
             }
+
+        //todo sql 에러 해결할 것
+        //내가 좋아요 누른 회원과 매칭이 됐는지 확인
+        if (isLikePresent(id, likingMember.getId()) && isLikePresent(likingMember.getId(), id)){
+                log.info("매칭 성공");
+
+                //매칭된 경우 기존 대화방이 있는지 확인
+                //대화방이 없으면 새로 저장
+                if (isRoomEmpty(id, likingMember.getId()) && isRoomEmpty(likingMember.getId(), id)) {
+                    Room newRoom = new Room(id, likingMember.getId());
+                    roomRepository.save(newRoom);
+                }
+        }
+
+
             return new LikeResponseDto("좋아요를 눌렀습니다.", HttpStatus.OK.value());
         }
+
+
     //좋아요 취소
     @Transactional
     public LikeResponseDto dislike(Long id, Member member) {
@@ -105,4 +128,18 @@ public class LikeService {
         }
         return (LocalDateTime.now().getYear() - year + 1);
     }
+
+    //회원 두 명의 id로 만들어진 대화방이 있는지 확인
+    private boolean isRoomEmpty(Long member1, Long member2) {
+        return roomRepository.findByMember1AndMember2(member1, member2).isEmpty();
+    }
+
+    private boolean isLikePresent(Long member1, Long member2) {
+        List<Likes> likes = likeRepository.findByLikingAndLiked(member1, member2);
+        if (likes.get(0) == null) {
+            return false;
+        }
+        return true;
+    }
+
 }

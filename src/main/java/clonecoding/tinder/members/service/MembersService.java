@@ -3,6 +3,8 @@ package clonecoding.tinder.members.service;
 import clonecoding.tinder.jwt.JwtUtil;
 import clonecoding.tinder.like.entity.Likes;
 import clonecoding.tinder.like.repository.LikeRepository;
+import clonecoding.tinder.matching.model.Room;
+import clonecoding.tinder.matching.repository.RoomRepository;
 import clonecoding.tinder.members.dto.MemberLoginRequestDto;
 import clonecoding.tinder.members.dto.MemberResponseMsgDto;
 import clonecoding.tinder.members.dto.MemberSignupRequestDto;
@@ -33,6 +35,7 @@ import java.util.stream.Stream;
 @Service
 @RequiredArgsConstructor
 public class MembersService {
+    private final RoomRepository roomRepository;
 
     private final MemberRepository memberRepository;
     private final LikeRepository likeRepository;
@@ -76,6 +79,11 @@ public class MembersService {
         likeRepository.save(likes);
         Likes likes2 = new Likes(member1.getId(), member5.getId());
         likeRepository.save(likes2);
+        Likes likes3 = new Likes(member1.getId(), member4.getId());
+        likeRepository.save(likes3);
+
+        Room room = new Room(1L, 5L);
+        roomRepository.save(room);
     }
 
     //API가 호출 될 때마다 회원 한 명씩 반환하기 위한 List
