@@ -43,21 +43,21 @@ public class CustomMemberRepositoryImpl implements CustomMemberRepository {
     public List<Member> findAllWithoutLike(Long myId, int offset, int limit, MemberSearch memberSearch) {
 
         //조회할 회원 중 나 자신은 제외하고, 내가 이미 좋아요 한 회원도 제외함
-        String jpql = "select m from Member m where m.id != :myId and m.id not in " +
+        String jpql = "select m from Member m where m.id != :myId and m.id not in" +
                 "(select l.likedMember from Likes l where l.likingMember = :myId2) ";
 
         boolean isFirstCondition = true;
 
         //내가 원하는 성별을 골라서 조회함(여자를 원하는 경우)
         if (memberSearch.isFemale()) {
-            jpql += "and m.gender in (0";
+            jpql += "and m.myGender in (0";
             isFirstCondition = false;
         }
 
         //남자를 원하는 경우
         if (memberSearch.isMale()) {
             if (isFirstCondition) {
-                jpql += "and m.gender in (1)";
+                jpql += "and m.myGender in (1)";
             } else { //남녀 둘다 원하는 경우
                 jpql += ", 1)";
             }
