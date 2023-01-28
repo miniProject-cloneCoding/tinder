@@ -25,7 +25,7 @@ public class MemberRedisRepository {
 
         //유저이름을 가지고 키를 만들어준다
         String key = getKey(user.getPhoneNum());
-        log.info("Set User to Redis {}({})", key, user);
+        log.info("Redis에 회원저장 {}({})", key, user);
 
         // 데이터가 올라간 시점으로부터 3일동안만 유효
         userRedisTemplate.opsForValue().set(key, user, USER_CACHE_TTL);
@@ -33,13 +33,13 @@ public class MemberRedisRepository {
 
     public Optional<UserDetailsImpl> getUser(String phoneNum) {
         UserDetailsImpl user = userRedisTemplate.opsForValue().get(getKey(phoneNum));
-        log.info("Get User from Redis {}", user);
+        log.info("Redis에서 회원조회 {}", user);
         return Optional.ofNullable(user);
     }
 
     private String getKey(String phoneNum) {
 
-        //Redis에서 키 값을 구성할 떄 앞에 prefix 붙여주는 것이 좋다
+        // Redis에서 키 값을 구성할 떄 앞에 prefix 붙여주는 것이 좋다
         // 아래와 같이 USER 를 붙이면 User에 관한 정보라는 것을 키값만 보고도 알 수 있다
         return "USER:" + phoneNum;
     }
