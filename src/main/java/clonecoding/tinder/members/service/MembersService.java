@@ -106,6 +106,7 @@ public class MembersService {
 
     //추천회원 한명 조회하기
     public MembersResponseDto getMember(String phoneNum, MemberFindRequestDto requestDto) {
+        log.info("map 사이즈는 = {}", map.size());
 
         Member my = findMember(phoneNum);
 
@@ -134,7 +135,15 @@ public class MembersService {
             count = 0; //다시 0부터 카운트 시작
         }
 
-        //todo 내가 원하는 성별 memberSearch 조건에 넣어주기
+        //map 안에 조회한 회원들의 정보가 있다면 DB 조회 안하고 바로 가져오기
+        if (map.size() > 0) {
+            return membersResponseDtoList.get(count++);
+        }
+
+        /*
+            map 안에 정보가 없다면 -> DB에서 조회하기
+         */
+        //내가 원하는 성별 memberSearch 조건에 넣어주기
         String[] split = my.getWantedGender().split(",");
         log.info("내가 원하는 성별 = {}", Arrays.toString(split));
         MemberSearch memberSearch = new MemberSearch(split);
@@ -151,7 +160,9 @@ public class MembersService {
         membersResponseDtoList = sortDto(my, dtoList);
 
         //dto의 값들을 map에 넣어준다 (나중에 좋아요한 사람의 키 값을 가지고 삭제하기 위함)
-        membersResponseDtoList.stream().map(membersResponseDto -> map.put(membersResponseDto.getId(), membersResponseDto));
+        for (MembersResponseDto responseDto : membersResponseDtoList) {
+            map.put(responseDto.getId(), responseDto);
+        }
 
         //api 호출 시마다 count++하여 dto에서 순차적으로 회원을 조회한다
         log.info("회원 조회 카운트 = {} ", count);
