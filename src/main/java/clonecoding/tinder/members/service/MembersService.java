@@ -53,17 +53,17 @@ public class MembersService {
 
 
     //초기데이터 todo 삭제할 것
-//    @PostConstruct
+    @PostConstruct
     public void init() {
-        Member member1 = new Member("member1", "011", "pass", 126.925205, 37.4787760, "930206", "https://cdn.pixabay.com/photo/2017/08/06/12/52/woman-2592247_960_720.jpg", 0, "0,1"); //소산
-        Member member2 = new Member("member2", "012", "pass", 126.923300, 37.5818396, "000123", "https://cdn.pixabay.com/photo/2017/08/06/12/52/woman-2592247_960_720.jpg", 0, "1"); //보노
-        Member member3 = new Member("member3", "013", "pass", 126.729566, 37.4928588, "980703", "https://cdn.pixabay.com/photo/2017/08/06/12/52/woman-2592247_960_720.jpg", 0, "1"); //인천
-        Member member4 = new Member("member4", "014", "pass", 127.028230, 37.5007549, "650403", "https://cdn.pixabay.com/photo/2017/08/06/12/52/woman-2592247_960_720.jpg", 1, "0"); //강남
-        Member member5 = new Member("member5", "015", "pass", 126.925386, 37.4788392, "850519", "https://cdn.pixabay.com/photo/2017/08/06/12/52/woman-2592247_960_720.jpg", 1, "0"); //문성로
-        Member member6 = new Member("member6", "016", "pass", 126.917397, 37.4749234, "990818", "https://cdn.pixabay.com/photo/2017/08/06/12/52/woman-2592247_960_720.jpg", 1, "0"); //난곡로
-        Member member7 = new Member("member7", "017", "pass", 127.028230, 37.5007549, "650403", "https://cdn.pixabay.com/photo/2017/08/06/12/52/woman-2592247_960_720.jpg", 1, "0"); //강남
-        Member member8 = new Member("member8", "018", "pass", 126.925386, 37.4788392, "850519", "https://cdn.pixabay.com/photo/2017/08/06/12/52/woman-2592247_960_720.jpg", 1, "0"); //문성로
-        Member member9 = new Member("member9", "019", "pass", 126.917397, 37.4749234, "990818", "https://cdn.pixabay.com/photo/2017/08/06/12/52/woman-2592247_960_720.jpg", 1, "0"); //난곡로
+        Member member1 = new Member("member1", "011", "pass", 126.925205, 37.4787760, "930206", "https://cdn.pixabay.com/photo/2017/08/06/12/52/woman-2592247_960_720.jpg", 0, true, true); //소산
+        Member member2 = new Member("member2", "012", "pass", 126.923300, 37.5818396, "000123", "https://cdn.pixabay.com/photo/2017/08/06/12/52/woman-2592247_960_720.jpg", 0, true, false); //보노
+        Member member3 = new Member("member3", "013", "pass", 126.729566, 37.4928588, "980703", "https://cdn.pixabay.com/photo/2017/08/06/12/52/woman-2592247_960_720.jpg", 0, true, false); //인천
+        Member member4 = new Member("member4", "014", "pass", 127.028230, 37.5007549, "650403", "https://cdn.pixabay.com/photo/2017/08/06/12/52/woman-2592247_960_720.jpg", 1, false, true); //강남
+        Member member5 = new Member("member5", "015", "pass", 126.925386, 37.4788392, "850519", "https://cdn.pixabay.com/photo/2017/08/06/12/52/woman-2592247_960_720.jpg", 1, false, true); //문성로
+        Member member6 = new Member("member6", "016", "pass", 126.917397, 37.4749234, "990818", "https://cdn.pixabay.com/photo/2017/08/06/12/52/woman-2592247_960_720.jpg", 1, false, true); //난곡로
+        Member member7 = new Member("member7", "017", "pass", 127.028230, 37.5007549, "650403", "https://cdn.pixabay.com/photo/2017/08/06/12/52/woman-2592247_960_720.jpg", 1, false, true); //강남
+        Member member8 = new Member("member8", "018", "pass", 126.925386, 37.4788392, "850519", "https://cdn.pixabay.com/photo/2017/08/06/12/52/woman-2592247_960_720.jpg", 1, false, true); //문성로
+        Member member9 = new Member("member9", "019", "pass", 126.917397, 37.4749234, "990818", "https://cdn.pixabay.com/photo/2017/08/06/12/52/woman-2592247_960_720.jpg", 1, false, true); //난곡로
 
         memberRepository.save(member1);
         memberRepository.save(member2);
@@ -97,9 +97,7 @@ public class MembersService {
         Member my = findMember(phoneNum);
 
         // 내가 원하는 성별 memberSearch 조건에 넣어주기
-        String[] split = my.getWantedGender().split(",");
-        log.info("내가 원하는 성별 = {}", Arrays.toString(split));
-        MemberSearch memberSearch = new MemberSearch(split);
+        MemberSearch memberSearch = new MemberSearch(my.isWantingMale(), my.isWantingFemale());
 
         //전체 회원 중 이미 좋아요한 회원 제외하고 가져오기
         //파라미터 (내 아이디, 페이지번호, 페이지 사이즈)
@@ -152,9 +150,7 @@ public class MembersService {
             map 안에 정보가 없다면 -> DB에서 조회하기
          */
         //내가 원하는 성별 memberSearch 조건에 넣어주기
-        String[] split = my.getWantedGender().split(",");
-        log.info("내가 원하는 성별 = {}", Arrays.toString(split));
-        MemberSearch memberSearch = new MemberSearch(split);
+        MemberSearch memberSearch = new MemberSearch(my.isWantingMale(), my.isWantingFemale());
 
         //전체 회원 중 이미 좋아요한 회원 제외하고, 내가 원하는 성별만 가져오기
         //파라미터 (내 아이디, 성별검색조건)
@@ -303,6 +299,11 @@ public class MembersService {
                 .birthDate(memberSignupRequestDto.getBirthDate())
                 .profile(memberSignupRequestDto.getProfile())
                 .password(passwordEncoder.encode(memberSignupRequestDto.getPassword()))
+                .latitude(memberSignupRequestDto.getLatitude())
+                .longitude(memberSignupRequestDto.getLongitude())
+                .myGender(memberSignupRequestDto.getMyGender())
+                .wantingMale(memberSignupRequestDto.isWantingMale())
+                .wantingFemale(memberSignupRequestDto.isWantingFemale())
                 .email("0")
                 .build();
 

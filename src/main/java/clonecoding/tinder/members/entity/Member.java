@@ -3,7 +3,6 @@ package clonecoding.tinder.members.entity;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
 @Getter
@@ -32,17 +31,19 @@ public class Member {
     @Column(nullable = false)
     private String profile;
 
-//    @Column(nullable = false)
+    //    @Column(nullable = false)
     private String email;
 
     private double latitude;
     private double longitude;
-    private int gender; //0 여자 , 1 남자
-    private String wantedGender;
+    private int myGender; //0 여자 , 1 남자
+    private boolean wantingMale; //여자를 원하는지 여부
+    private boolean wantingFemale; //남자를 원하는지 여부
 
     public Member() {}
 
-    public Member(String nickName, String phoneNum, String password, double latitude, double longitude, String birthDate, String profile, int gender, String wantedGender) {
+    public Member(String nickName, String phoneNum, String password, double latitude, double longitude,
+                  String birthDate, String profile, int myGender, boolean wantingMale, boolean wantingFemale) {
         this.phoneNum = phoneNum;
         this.nickName = nickName;
         this.password = password;
@@ -50,7 +51,8 @@ public class Member {
         this.longitude = longitude;
         this.birthDate = birthDate;
         this.profile = profile;
-        this.gender = gender;
-        this.wantedGender = wantedGender;
+        this.myGender = myGender;
+        this.wantingMale = wantingMale;
+        this.wantingFemale = wantingFemale;
     }
 }
