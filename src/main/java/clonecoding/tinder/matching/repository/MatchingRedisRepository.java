@@ -21,10 +21,12 @@ public class MatchingRedisRepository {
     private final static Duration COMMENT_CACHE_TTL = Duration.ofDays(30); //30일 지난 데이터 삭제
 
     public void setComments(Comments comments, Long roomId) {
+        log.info("Redis 실행 댓글 저장하기 방 번호는 = {}", roomId);
         redisTemplate.opsForValue().set(roomId, comments, COMMENT_CACHE_TTL);
     }
 
     public Optional<Comments> getComments(Long roomId) {
+        log.info("Redis 실행 댓글 저장하기 방 번호는 = {}", roomId);
         Comments comments = redisTemplate.opsForValue().get(roomId);
         return Optional.ofNullable(comments);
     }
