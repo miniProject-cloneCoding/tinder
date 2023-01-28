@@ -23,8 +23,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class MatchingService {
-    private final RoomRepository roomRepository;
 
+    private final RoomRepository roomRepository;
     private final MemberRepository memberRepository;
     private final LikeRepository likeRepository;
     private final MemberRedisRepository redisRepository;

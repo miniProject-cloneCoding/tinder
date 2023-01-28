@@ -54,10 +54,10 @@ public class RedisConfig {
         // ConnectionFactory가 그 정보를 가지고 있다
         redisTemplate.setConnectionFactory(redisConnectionFactory());
 
-        //데이터를 저장할 때 serializer 해준다  (키가 String 이므로 nStringRedisSerializer 사용했다)
+        //데이터를 저장할 때 serializer 해준다  (키 값이 String 이므로 StringRedisSerializer 사용했다)
         redisTemplate.setKeySerializer(new StringRedisSerializer());
 
-        //데이터를 저장할 때 serializer 해준다 (User는 오브젝트 이므로 Jackson2~~ 사용했다)
+        //데이터를 저장할 때 serializer 해준다 (User는 오브젝트 이므로 Jackson2JsonRedisSerializer 사용했다)
         redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<UserDetailsImpl>(UserDetailsImpl.class));
         return redisTemplate;
     }
@@ -69,6 +69,4 @@ public class RedisConfig {
         redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<Comments>(Comments.class));
         return redisTemplate;
     }
-
-
 }

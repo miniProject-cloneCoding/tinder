@@ -4,6 +4,7 @@ import clonecoding.tinder.matching.model.Comments;
 import clonecoding.tinder.matching.model.dto.CommentRequestDto;
 import clonecoding.tinder.matching.model.dto.CommentResponseDto;
 import clonecoding.tinder.matching.repository.MatchingRedisRepository;
+import clonecoding.tinder.matching.repository.RoomRepository;
 import clonecoding.tinder.members.entity.Member;
 import clonecoding.tinder.members.repository.MemberRedisRepository;
 import clonecoding.tinder.members.repository.MemberRepository;
@@ -28,12 +29,17 @@ public class CommentService {
     private final MemberRepository memberRepository;
     private final MemberRedisRepository redisRepository;
     private final MatchingRedisRepository matchingRedisRepository;
+    private final RoomRepository roomRepository;
 
     //상대방과 내가 주고받은 모든 댓글 가져오기
     public List<CommentResponseDto> getComments(String phoneNum, CommentRequestDto requestDto) {
 
         Member my = findMember(phoneNum);
         Member oppositeMember = findOppositeMember(requestDto);
+
+        if (!isRoomMember(my.getId(), oppositeMember.getId())) {
+            throw new IllegalArgumentException("대화방에 참여할 수 없습니다");
+        }
 
         //해당 대화방에서 주고받은 모든 댓글 가져오기
         Optional<Comments> comments = matchingRedisRepository.getComments(requestDto.getRoomId());
@@ -62,6 +68,10 @@ public class CommentService {
         //상대방 정보 찾아오기
         Member oppositeMember = findOppositeMember(requestDto);
         log.info("내가 댓글 보내는 상대방 id = {}", oppositeMember.getId());
+
+        if (!isRoomMember(my.getId(), oppositeMember.getId())) {
+            throw new IllegalArgumentException("매칭되지 않은 상대에게는 댓글을 작성할 수 없습니다");
+        }
 
         LocalDateTime now = LocalDateTime.now();
 
@@ -132,6 +142,15 @@ public class CommentService {
         return comments.getComments().stream()
                 .sorted(Comparator.comparing(CommentResponseDto::getCreatedAt))
                 .collect(Collectors.toList());
+    }
+
+    //해당 유저가 대화방에 참여할 자격이 있는지 확인
+    private boolean isRoomMember(Long member1, Long member2) {
+        if (roomRepository.findByMember1AndMember2(member1, member2).isPresent() &
+                roomRepository.findByMember1AndMember2(member1, member2).isPresent()) {
+            return true;
+        }
+        return false;
     }
 
 }
