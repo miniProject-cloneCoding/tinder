@@ -17,30 +17,8 @@ public class CustomMemberRepositoryImpl implements CustomMemberRepository {
     @PersistenceContext
     private final EntityManager em;
 
-//    private final JPAQueryFactory queryFactory;
-//
-//    public CustomMemberRepositoryImpl(EntityManager em) {
-//        queryFactory = new JPAQueryFactory(em);
-//    }
-
-
-//    @Override
-//    public List<Member> findAllWithoutLike(Long myId, Long offset, int limit) {
-//        return queryFactory.selectFrom(member)
-//                .where(member.id.ne(myId), //나 자신은 제외
-//                        member.id.notIn(  //내가 좋아요 한 사람도 제외
-//                        (Number) JPAExpressions
-//                                .select(likes.likedMember)
-//                                .from(likes)
-//                                .where(likes.likingMember.id.eq(myId))
-//                ))
-//                .offset(offset)
-//                .limit(limit)
-//                .fetch();
-//    }
-
     @Override //전체 조회하기
-    public List<Member> findAllWithoutLike(Long myId, int offset, int limit, MemberSearch memberSearch) {
+    public List<Member> findAllWithPaging(Long myId, int offset, int limit, MemberSearch memberSearch) {
 
         //조회할 회원 중 나 자신은 제외하고, 내가 이미 좋아요 한 회원도 제외함
         String jpql = "select m from Member m where m.id != :myId and m.id not in" +
@@ -54,9 +32,8 @@ public class CustomMemberRepositoryImpl implements CustomMemberRepository {
             isFirstCondition = false;
         }
 
-        //남자를 원하는 경우
         if (memberSearch.isMale()) {
-            if (isFirstCondition) {
+            if (isFirstCondition) {  //남자만 원하는 경우
                 jpql += "and m.myGender in (1)";
             } else { //남녀 둘다 원하는 경우
                 jpql += ", 1)";
@@ -65,7 +42,7 @@ public class CustomMemberRepositoryImpl implements CustomMemberRepository {
             jpql += ")";
         }
 
-        log.info("getMember jpql = {} ", jpql);
+        log.info("회원 전체 조회(페이징) jpql = {} ", jpql);
 
         TypedQuery<Member> query = em.createQuery(jpql, Member.class);
 
@@ -100,7 +77,7 @@ public class CustomMemberRepositoryImpl implements CustomMemberRepository {
             jpql += ")";
         }
 
-        log.info("getMember jpql = {} ", jpql);
+        log.info("회원 전체 조회 jpql = {} ", jpql);
 
         TypedQuery<Member> query = em.createQuery(jpql, Member.class);
         //파라미터 바인딩

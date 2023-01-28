@@ -23,19 +23,16 @@ public class Member {
     @Column(nullable = false)
     private String password;
 
-//todo 주석풀기
-
     @Column(nullable = false)
     private String birthDate;
 
     @Column(nullable = false)
-    private String profile;
+    private String profile; //프로필사진 URL
 
     //    @Column(nullable = false)
     private String email;
-
-    private double latitude;
-    private double longitude;
+    private double latitude; //위도
+    private double longitude; //경도
     private int myGender; //0 여자 , 1 남자
     private boolean wantingMale; //여자를 원하는지 여부
     private boolean wantingFemale; //남자를 원하는지 여부

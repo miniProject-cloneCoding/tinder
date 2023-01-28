@@ -60,17 +60,15 @@ public class LikeService {
             log.info("매칭 성공");
 
             //매칭된 경우 기존 대화방이 있는지 확인
-            //대화방이 없으면 새로 저장
+            //대화방이 없으면 새로운 대화방을 만들어서 저장
             if (isRoomEmpty(id, likingMember.getId()) && isRoomEmpty(likingMember.getId(), id)) {
                 Room newRoom = new Room(id, likingMember.getId());
                 roomRepository.save(newRoom);
             }
         }
 
-
         return new LikeResponseDto("좋아요를 눌렀습니다.", HttpStatus.OK.value());
     }
-
 
     //좋아요 취소
     @Transactional
@@ -118,7 +116,6 @@ public class LikeService {
         return dtoList;
     }
 
-
     //생년월일에서 나이 가져오기
     private int calculateAge(String birthDate) {
         int year = Integer.parseInt(birthDate.substring(0, 2));
@@ -142,5 +139,4 @@ public class LikeService {
         }
         return true;
     }
-
 }

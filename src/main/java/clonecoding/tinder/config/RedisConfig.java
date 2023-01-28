@@ -20,7 +20,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @RequiredArgsConstructor
 public class RedisConfig {
 
-    private final RedisProperties redisProperties; //applicaion.yaml에 spring redis설정하면 RedisProperties를 제공해준다
+    private final RedisProperties redisProperties; //applicaion.properties에 spring redis설정하면 RedisProperties를 제공해준다
 
     @Bean //ConnectionFactory 빈으로 등록
     public RedisConnectionFactory redisConnectionFactory() {
@@ -47,7 +47,7 @@ public class RedisConfig {
         //RedisTemplate을 Bean으로 만들어서 반환
         RedisTemplate<String, UserDetailsImpl> redisTemplate = new RedisTemplate<>();
 
-        //너무 자주 변하는 데이터는 캐싱을 해도 별로..?
+        //너무 자주 변하는 데이터는 캐싱을 해도 별로
         //자주 사용하고 접근이 많은 데이터를 캐싱하는 것이 좋음(DB 부하가 적어지므로)
         // -> 그렇다면 가장 많이 사용하는 User 를 캐싱해 보는 것이 좋음 (매 API 마다 필터를 탈 때 DB에서 USER를 체크하니까)
 
@@ -67,7 +67,10 @@ public class RedisConfig {
     public RedisTemplate<Long, Comments> matchingRedisTemplate() {
         RedisTemplate<Long, Comments> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory());
+
+        //숫자도 이렇게 serializer 해주어야 Redis CLI 창에서 제대로 키 값이 보인다
         redisTemplate.setKeySerializer(new GenericToStringSerializer<>(Long.class));
+
         redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<Comments>(Comments.class));
         return redisTemplate;
     }
