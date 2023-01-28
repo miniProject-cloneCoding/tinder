@@ -4,7 +4,8 @@ package clonecoding.tinder.matching.service;
 import clonecoding.tinder.like.entity.Likes;
 import clonecoding.tinder.like.repository.LikeRepository;
 import clonecoding.tinder.matching.model.dto.MatchingDto;
-import clonecoding.tinder.members.dto.MembersResponseDto;
+import clonecoding.tinder.matching.model.dto.MatchingResponseDto;
+import clonecoding.tinder.matching.repository.RoomRepository;
 import clonecoding.tinder.members.entity.Member;
 import clonecoding.tinder.members.repository.MemberRedisRepository;
 import clonecoding.tinder.members.repository.MemberRepository;
@@ -22,13 +23,14 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class MatchingService {
+    private final RoomRepository roomRepository;
 
     private final MemberRepository memberRepository;
     private final LikeRepository likeRepository;
     private final MemberRedisRepository redisRepository;
 
     //나와 매칭된 회원들 보여주기
-    public List<MembersResponseDto> getMatching(String phoneNum) {
+    public List<MatchingResponseDto> getMatching(String phoneNum) {
 
         //내 정보 가져오기
         Member my = findMember(phoneNum);
@@ -86,14 +88,17 @@ public class MatchingService {
 
         //매칭된 회원들의 id를 가지고 member를 검색해온다
         return memberRepository.findAllById(matchingIds).stream().map(member ->
-                MembersResponseDto.builder()
-                        .id(member.getId())
+                MatchingResponseDto.builder()
+                        .memberId(member.getId())
                         .nickName(member.getNickName())
                         .profile(member.getProfile())
                         .distance(calculateDistance(my.getLatitude(), my.getLongitude(), member.getLatitude(), member.getLongitude()))
                         .age(calculateAge(member.getBirthDate()))
+                        .roomId(findRoomId(my.getId(), member.getId()))
                         .build()).collect(Collectors.toList());
     }
+
+
 
     //로그인한 내 정보를 phoneNum 으로 찾아오기 (Redis에서 먼저 검색 후 없으면 DB 접근)
     private Member findMember(String phoneNum) {
@@ -114,6 +119,17 @@ public class MatchingService {
             year += 1900;
         }
         return (LocalDateTime.now().getYear() - year + 1);
+    }
+
+    //나와 매칭된 회원과의 대화방 id 가져오기
+    private Long findRoomId(Long id1, Long id2) {
+        if (roomRepository.findByMember1AndMember2(id1, id2).isPresent()) {
+            return roomRepository.findByMember1AndMember2(id1, id2).get().getId();
+        }
+        if (roomRepository.findByMember1AndMember2(id1, id2).isPresent()) {
+            return roomRepository.findByMember1AndMember2(id2, id1).get().getId();
+        }
+        return 0L;
     }
 
     // Haversine formula (위도, 경도로 거리 구하기)

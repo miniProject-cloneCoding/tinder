@@ -1,5 +1,6 @@
 package clonecoding.tinder.config;
 
+import clonecoding.tinder.matching.model.Comments;
 import clonecoding.tinder.security.UserDetailsImpl;
 import io.lettuce.core.RedisURI;
 import lombok.RequiredArgsConstructor;
@@ -60,5 +61,14 @@ public class RedisConfig {
         redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<UserDetailsImpl>(UserDetailsImpl.class));
         return redisTemplate;
     }
+
+    @Bean
+    public RedisTemplate<Long, Comments> matchingRedisTemplate() {
+        RedisTemplate<Long, Comments> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory());
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<Comments>(Comments.class));
+        return redisTemplate;
+    }
+
 
 }

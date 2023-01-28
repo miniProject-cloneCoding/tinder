@@ -31,4 +31,16 @@ public class CustomLikeRepositoryImpl implements CustomLikeRepository{
         query.setParameter("myId", myId);
         return query.getResultList();
     }
+
+    @Override
+    public List<Likes> findByLikingAndLiked(Long id1, Long id2) {
+        TypedQuery<Likes> query = em.createQuery("select l from Likes l where l.likedMember = :id1 and l.likingMember = :id2", Likes.class);
+
+        //파라미터 바인딩
+        query.setParameter("id1", id1);
+        query.setParameter("id2", id2);
+
+        return query.getResultList();
+
+    }
 }

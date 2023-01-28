@@ -10,4 +10,6 @@ public interface CustomLikeRepository {
     List<Likes> findMyLiking(Long phoneNum);
 
     List<Likes> findMyLiked(Long phoneNum);
+
+    List<Likes> findByLikingAndLiked(Long id1, Long id2);
 }
