@@ -30,7 +30,7 @@ public class MembersController {
 
     @GetMapping
     public Page<MembersResponseDto> getMembers(Pageable pageable, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        log.info("컨트롤러 실행");
+        log.info("Members 컨트롤러 - 회원 전체 조회 실행");
         return membersService.getMembers(pageable, userDetails.getMember().getPhoneNum());
     }
 
