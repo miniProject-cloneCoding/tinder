@@ -53,7 +53,7 @@ public class MembersService {
 
 
     //초기데이터 todo 삭제할 것
-    @PostConstruct
+//    @PostConstruct
     public void init() {
         Member member1 = new Member("member1", "011", "pass", 126.925205, 37.4787760, "930206", "https://cdn.pixabay.com/photo/2017/08/06/12/52/woman-2592247_960_720.jpg", 0, true, true); //소산
         Member member2 = new Member("member2", "012", "pass", 126.923300, 37.5818396, "000123", "https://cdn.pixabay.com/photo/2017/08/06/12/52/woman-2592247_960_720.jpg", 0, true, false); //보노
@@ -287,7 +287,8 @@ public class MembersService {
          */
 
         // ?= 뒷부분을 확인하겠다. .* 하나라도 있는 지 체크. .은 어떤 한 개의 문자, *은 앞의 문자가 0개 이상 있음을 의미.
-        if (memberSignupRequestDto.getPassword().matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,12}$")) {
+//        if (memberSignupRequestDto.getPassword().matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,12}$")) {
+        if (memberSignupRequestDto.getPassword().matches("(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[~!@#$%^&*()_+=]).{8,12}")) {
             return new MemberResponseMsgDto("비밀번호는 영어 대소문자, 숫자의 최소 8자에서 최대 12자리여야 합니다.", HttpStatus.BAD_REQUEST.value());
         }
 
