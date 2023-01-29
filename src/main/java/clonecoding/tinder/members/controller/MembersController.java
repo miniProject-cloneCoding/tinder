@@ -26,7 +26,7 @@ public class MembersController {
     private final MembersService membersService;
 
     // 전체 회원 조회해서 가져오기
-    @ApiOperation(value = "회원 조회(페이징)")
+    @ApiOperation(value = "회원 전체 조회(페이징)")
 
     @GetMapping
     public Page<MembersResponseDto> getMembers(Pageable pageable, @AuthenticationPrincipal UserDetailsImpl userDetails) {

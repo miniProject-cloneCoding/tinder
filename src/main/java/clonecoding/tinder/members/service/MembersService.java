@@ -24,7 +24,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -52,7 +51,7 @@ public class MembersService {
     private Long expiredTimeMs;
 
 
-    //초기데이터 todo 삭제할 것
+    //todo 초기데이터 삭제할 것
 //    @PostConstruct
     public void init() {
         Member member1 = new Member("member1", "011", "pass", 126.925205, 37.4787760, "930206", "https://cdn.pixabay.com/photo/2017/08/06/12/52/woman-2592247_960_720.jpg", 0, true, true); //소산
@@ -91,9 +90,10 @@ public class MembersService {
     public static int count = 0;
     public static Map<Long, MembersResponseDto> map = new HashMap<>(); //좋아요 한 회원 삭제하는 용도
 
-    //회원 페이징하여 조회하기
+    //회원 전체 페이징하여 조회하기
     public Page<MembersResponseDto> getMembers(Pageable pageable, String phoneNum) {
 
+        //내 정보 가져오기
         Member my = findMember(phoneNum);
 
         // 내가 원하는 성별 memberSearch 조건에 넣어주기
@@ -101,7 +101,7 @@ public class MembersService {
 
         //전체 회원 중 이미 좋아요한 회원 제외하고 가져오기
         //파라미터 (내 아이디, 페이지번호, 페이지 사이즈)
-        List<Member> members = memberRepository.findAllWithoutLike(my.getId(), Long.valueOf(pageable.getOffset()).intValue(), pageable.getPageSize(), memberSearch);
+        List<Member> members = memberRepository.findAllWithPaging(my.getId(), Long.valueOf(pageable.getOffset()).intValue(), pageable.getPageSize(), memberSearch);
 
         //entity -> dto 변환
         Stream<MembersResponseDto> dtoList = members.stream().map(MembersResponseDto::fromEntity);
@@ -119,21 +119,24 @@ public class MembersService {
         //좋아요를 눌렀다면
         if (requestDto.isLike()) {
 
-            //좋아요 요청한 사람의 id가 존재하지 않는다면
+            //좋아요 할 사람의 id가 존재하지 않는다면 Exception
             if (memberRepository.findById(requestDto.getId()).isEmpty()) {
                 throw new IllegalArgumentException("존재하지 않는 회원입니다");
             }
 
-            //좋아요 테이블에 좋아요 기록 저장
+            //좋아요 테이블에 좋아요 저장
             Likes likes = new Likes(requestDto.getId(), my.getId());
             likeRepository.save(likes);
-            map.remove(requestDto.getId()); //map 에서 좋아요 한 사람 삭제하기
+
+            //map 에서 좋아요 한 사람 삭제하기 (그래야 다음 조회 떄 좋아요 한 사람 나오지 않음)
+            map.remove(requestDto.getId());
         }
 
         // 전체 회원 한 바퀴 다 돌았다면
         if (count == membersResponseDtoList.size()) {
 
             //dtoList 초기화하고 갱신된 map의 회원정보를 dto에 담아줌
+            // -> map에는 좋아요 한 사람이 빠져있음
             membersResponseDtoList = new ArrayList<>();
             for (int i = 0; i < map.size(); i++) {
                 membersResponseDtoList.add(map.get((long) i));
@@ -288,7 +291,7 @@ public class MembersService {
 
         // ?= 뒷부분을 확인하겠다. .* 하나라도 있는 지 체크. .은 어떤 한 개의 문자, *은 앞의 문자가 0개 이상 있음을 의미.
 //        if (memberSignupRequestDto.getPassword().matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,12}$")) {
-        if (memberSignupRequestDto.getPassword().matches("(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[~!@#$%^&*()_+=]).{8,12}")) {
+        if (memberSignupRequestDto.getPassword().matches("(?=.*[0-9])(?=.*[a-zA-Z]).{8,12}")) {
             return new MemberResponseMsgDto("비밀번호는 영어 대소문자, 숫자의 최소 8자에서 최대 12자리여야 합니다.", HttpStatus.BAD_REQUEST.value());
         }
 
