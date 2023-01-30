@@ -62,6 +62,7 @@ public class WebSecurityConfig {
                 //멤버 api는 인증을 받지 않는다.
                 .antMatchers("/member/**").permitAll()
                 .antMatchers("/members/**").permitAll()
+                .antMatchers("/upload/**").permitAll()
 
                 //swagger 관련해서 인증 통과
                 .antMatchers(PERMIT_URL_ARRAY).permitAll()

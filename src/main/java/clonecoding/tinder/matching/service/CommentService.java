@@ -1,8 +1,10 @@
 package clonecoding.tinder.matching.service;
 
 import clonecoding.tinder.matching.model.Comments;
+import clonecoding.tinder.matching.model.Room;
 import clonecoding.tinder.matching.model.dto.CommentRequestDto;
 import clonecoding.tinder.matching.model.dto.CommentResponseDto;
+import clonecoding.tinder.matching.model.dto.ProfileResponseDto;
 import clonecoding.tinder.matching.repository.MatchingRedisRepository;
 import clonecoding.tinder.matching.repository.RoomRepository;
 import clonecoding.tinder.members.entity.Member;
@@ -32,32 +34,37 @@ public class CommentService {
     private final RoomRepository roomRepository;
 
     //상대방과 내가 주고받은 모든 댓글 가져오기
-    public List<CommentResponseDto> getComments(String phoneNum, CommentRequestDto requestDto) {
+    public List<CommentResponseDto> getComments(String phoneNum, Long roomId) {
 
+        //방 정보 가져오기
+        Room room = findRoom(roomId);
+
+        //내 정보와 상대방 정보 찾아오기
         Member my = findMember(phoneNum);
-        Member oppositeMember = findOppositeMember(requestDto);
+        Member oppositeMember = findOppositeMember(getOppositeMemberId(room, my));
 
+        //해당 대화방 참여자가 아닌 경우
         if (!isRoomMember(my.getId(), oppositeMember.getId())) {
             throw new IllegalArgumentException("대화방에 참여할 수 없습니다");
         }
 
         //해당 대화방에서 주고받은 모든 댓글 가져오기
-        Optional<Comments> comments = matchingRedisRepository.getComments(requestDto.getRoomId());
+        Optional<Comments> comments = matchingRedisRepository.getComments(roomId);
 
         //댓글이 하나도 없는 경우에는 대화 상대방과 나의 기본 정보만 반환한다
         if (comments.isEmpty()) {
             List<CommentResponseDto> result = new ArrayList<>();
-            result.add(new CommentResponseDto(my.getNickName(), null, null, requestDto.getRoomId(),
-                    oppositeMember.getNickName(), oppositeMember.getProfile(), my.getNickName(), my.getProfile()));
+            result.add(new CommentResponseDto(my.getNickName(), null, null, roomId));
             return result;
         }
 
-        Comments result = new Comments();
-        result = comments.get();
+        Comments result = comments.get();
 
         //서로 보낸 댓글들을 작성일자 순서대로 정렬하여 return
         return getComments(result);
     }
+
+
 
     //댓글 작성하기
     public CommentResponseDto createComments(String phoneNum, CommentRequestDto requestDto) {
@@ -65,8 +72,11 @@ public class CommentService {
         //내 정보 찾아오기
         Member my = findMember(phoneNum);
 
+        Room room = findRoom(requestDto.getRoomId());
+
         //상대방 정보 찾아오기
-        Member oppositeMember = findOppositeMember(requestDto);
+        Member oppositeMember = findOppositeMember(getOppositeMemberId(room, my));
+
         log.info("내가 댓글 보내는 상대방 id = {}", oppositeMember.getId());
 
         if (!isRoomMember(my.getId(), oppositeMember.getId())) {
@@ -87,8 +97,7 @@ public class CommentService {
         }
 
         //작성한 댓글로 Dto 만들기
-        CommentResponseDto commentResponseDto = new CommentResponseDto(my.getNickName(), requestDto.getContent(), now, requestDto.getRoomId(),
-                oppositeMember.getNickName(), oppositeMember.getProfile(), my.getNickName(), my.getProfile());
+        CommentResponseDto commentResponseDto = new CommentResponseDto(my.getNickName(), requestDto.getContent(), now, requestDto.getRoomId());
 
         //redis에서 Comments (commentsDto 리스트) 가져오기
         Optional<Comments> comments = matchingRedisRepository.getComments(requestDto.getRoomId());
@@ -113,9 +122,27 @@ public class CommentService {
         return commentResponseDto;
     }
 
+    public ProfileResponseDto getProfile(String phoneNum, Long roomId) {
+        //내 정보 찾아오기
+        Member my = findMember(phoneNum);
+
+        Room room = findRoom(roomId);
+
+        //상대방 정보 찾아오기
+        Member oppositeMember = findOppositeMember(getOppositeMemberId(room, my));
+
+        return ProfileResponseDto.builder()
+                .myName(my.getNickName())
+                .myProfile(my.getProfile())
+                .yourName(oppositeMember.getNickName())
+                .yourProfile(oppositeMember.getProfile())
+                .build();
+    }
+
+
     //상대방 정보 찾기
-    private Member findOppositeMember(CommentRequestDto requestDto) {
-        return memberRepository.findById(requestDto.getOppositeMember()).orElseThrow(
+    private Member findOppositeMember(Long memberId) {
+        return memberRepository.findById(memberId).orElseThrow(
                 () -> new IllegalArgumentException("일치하는 회원이 없습니다"));
     }
 
@@ -153,4 +180,14 @@ public class CommentService {
         return false;
     }
 
+    //방 정보를 바탕으로 상대방 id 찾기
+    private static Long getOppositeMemberId(Room room, Member my) {
+        return room.getMember1() == my.getId() ? room.getMember2() : room.getMember1();
+    }
+
+    private Room findRoom(Long roomId) {
+        return roomRepository.findById(roomId).orElseThrow(
+                () -> new IllegalArgumentException("대화방이 존재하지 않습니다.")
+        );
+    }
 }

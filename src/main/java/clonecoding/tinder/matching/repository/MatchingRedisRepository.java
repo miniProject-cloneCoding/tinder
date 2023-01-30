@@ -30,7 +30,6 @@ public class MatchingRedisRepository {
         Comments comments = redisTemplate.opsForValue().get(roomId);
         return Optional.ofNullable(comments);
     }
-
 }
 
 

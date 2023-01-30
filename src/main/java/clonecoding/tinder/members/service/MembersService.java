@@ -291,7 +291,7 @@ public class MembersService {
 
         // ?= 뒷부분을 확인하겠다. .* 하나라도 있는 지 체크. .은 어떤 한 개의 문자, *은 앞의 문자가 0개 이상 있음을 의미.
 //        if (memberSignupRequestDto.getPassword().matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,12}$")) {
-        if (memberSignupRequestDto.getPassword().matches("(?=.*[0-9])(?=.*[a-zA-Z]).{8,12}")) {
+        if (!memberSignupRequestDto.getPassword().matches("(?=.*[0-9])(?=.*[a-zA-Z]).{8,12}")) {
             return new MemberResponseMsgDto("비밀번호는 영어 대소문자, 숫자의 최소 8자에서 최대 12자리여야 합니다.", HttpStatus.BAD_REQUEST.value());
         }
 

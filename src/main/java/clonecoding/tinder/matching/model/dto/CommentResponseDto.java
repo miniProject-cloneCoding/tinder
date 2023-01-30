@@ -27,8 +27,4 @@ public class CommentResponseDto {
     private LocalDateTime createdAt;
     private Long roomId;
 
-    private String yourName;
-    private String yourProfile;
-    private String myName;
-    private String myProfile;
 }
