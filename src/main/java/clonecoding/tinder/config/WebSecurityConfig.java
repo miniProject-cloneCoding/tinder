@@ -62,6 +62,8 @@ public class WebSecurityConfig {
                 //멤버 api는 인증을 받지 않는다.
                 .antMatchers("/member/**").permitAll()
                 .antMatchers("/members/**").permitAll()
+                .antMatchers("/upload").permitAll()
+
 
                 //swagger 관련해서 인증 통과
                 .antMatchers(PERMIT_URL_ARRAY).permitAll()
@@ -77,7 +79,8 @@ public class WebSecurityConfig {
 //        http.formLogin().disable();
 
         //일단 폼로그인인지 뭔지 몰라서 주석처리
-//        http.formLogin().loginPage("/member/login").permitAll();
+//        http.formLogin().loginPage("/members/login").permitAll();
+//        http.formLogin().loginPage("/members/signup").permitAll();
 
         //혹시 forbidden 페이지 필요하다고 하면 살리기
 //        http.exceptionHandling().accessDeniedPage("/forbidden");
