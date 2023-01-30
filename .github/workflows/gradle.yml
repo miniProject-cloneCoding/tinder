@@ -13,11 +13,17 @@ on:
   pull_request:
     branches: [ "CI/CD" ]
 
+env:
+  AWS_REGION: ap-northeast-2
+  S3_BUCKET_NAME: clonecode-tinder
+  CODE_DEPLOY_APPLICATION_NAME: cloneCode-tinder
+  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: cloneCode-tinder-group
+
 permissions:
   contents: read
 
 jobs:
-  build:
+  deploy:
 
     runs-on: ubuntu-latest
 
@@ -63,3 +69,11 @@ jobs:
       - name: Upload to S3
         run: aws s3 cp --region ap-northeast-2 --acl private ./clonecode-tinder.zip s3://clonecode-tinder/
           
+      # S3 버킷에 있는 파일을 대상으로 CodeDeploy 실행
+      - name: Deploy to AWS EC2 from S3
+        run: |
+          aws deploy create-deployment \
+            --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
+            --deployment-config-name CodeDeployDefault.AllAtOnce \
+            --deployment-group-name ${{ env.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
+            --s3-location bucket=$S3_BUCKET_NAME,key=$GITHUB_SHA.zip,bundleType=zip
