@@ -2,6 +2,7 @@ package clonecoding.tinder.matching.controller;
 
 import clonecoding.tinder.matching.model.dto.CommentRequestDto;
 import clonecoding.tinder.matching.model.dto.CommentResponseDto;
+import clonecoding.tinder.matching.model.dto.CommentUpdateDto;
 import clonecoding.tinder.matching.model.dto.ProfileResponseDto;
 import clonecoding.tinder.matching.service.CommentService;
 import clonecoding.tinder.security.UserDetailsImpl;
@@ -35,7 +36,7 @@ public class CommentController {
     @ApiOperation(value = "댓글수정")
     @PatchMapping("/comments/{commentId}")
     public String updateComments(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                 @RequestBody CommentRequestDto requestDto,
+                                 @RequestBody CommentUpdateDto requestDto,
                                  @PathVariable Long commentId) {
         commentService.updateComments(userDetails.getMember().getPhoneNum(), requestDto, commentId);
         return "댓글 수정 완료";
