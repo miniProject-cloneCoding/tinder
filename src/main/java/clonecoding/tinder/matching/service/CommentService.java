@@ -19,6 +19,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -35,6 +36,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
 
     //상대방과 내가 주고받은 모든 댓글 가져오기
+    @Transactional(readOnly = true)
     public List<CommentResponseDto> getComments(String phoneNum, Long roomId) {
         log.info("댓글 조회하기 실행");
 
@@ -58,6 +60,7 @@ public class CommentService {
     }
 
     //댓글 작성하기
+    @Transactional
     public void createComments(String phoneNum, CommentRequestDto requestDto) {
         log.info("댓글 작성하기 실행");
 
@@ -80,6 +83,7 @@ public class CommentService {
     }
 
     //댓글 수정하기
+    @Transactional
     public void updateComments(String phoneNum, CommentRequestDto requestDto, Long commentId) {
         //내 정보 찾아오기
         Comment comment = getComment(phoneNum, commentId);
@@ -91,6 +95,7 @@ public class CommentService {
     }
 
     //댓글 삭제하기
+    @Transactional
     public void deleteComments(String phoneNum, Long commentId) {
         //댓글 찾아오기
         Comment comment = getComment(phoneNum, commentId);
@@ -99,6 +104,7 @@ public class CommentService {
     }
 
     //상대방과 나의 프로필 정보 가져오기
+    @Transactional(readOnly = true)
     public ProfileResponseDto getProfile(String phoneNum, Long roomId) {
         //내 정보 찾아오기
         Member my = findMember(phoneNum);
