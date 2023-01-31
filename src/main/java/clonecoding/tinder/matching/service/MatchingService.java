@@ -92,7 +92,7 @@ public class MatchingService {
                         .memberId(member.getId())
                         .nickName(member.getNickName())
                         .profile(member.getProfile())
-                        .distance(calculateDistance(my.getLatitude(), my.getLongitude(), member.getLatitude(), member.getLongitude()))
+                        .distance(roundDistance(calculateDistance(my.getLatitude(), my.getLongitude(), member.getLatitude(), member.getLongitude())))
                         .age(calculateAge(member.getBirthDate()))
                         .roomId(findRoomId(my.getId(), member.getId()))
                         .build()).collect(Collectors.toList());
@@ -141,5 +141,13 @@ public class MatchingService {
 
         double earthRadius = 6371; //Kilometers
         return earthRadius * Math.acos(Math.sin(lat1) * Math.sin(lat2) + Math.cos(lat1) * Math.cos(lat2) * Math.cos(lon1 - lon2));
+    }
+
+    //거리 반올림하기
+    private int roundDistance(double distance) {
+        if (Math.round(distance) < 1) {
+            return 1;
+        }
+        return (int) Math.round(distance);
     }
 }
