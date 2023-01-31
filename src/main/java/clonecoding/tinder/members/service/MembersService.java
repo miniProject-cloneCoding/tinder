@@ -226,22 +226,12 @@ public class MembersService {
         response.setStatus(statusCode);
         //콘텐츠 유형을 json으로 바꿔줌
         response.setContentType("application/json");
-        try {
-            //ObjectMapper 클래스를 사용하여 클래스의 객체를 SecurityExceptionDtoJSON 문자열로 변환.
-            //objectMapper는 자바 객체를 JSON으로 직렬화나 역직렬화 하는데 쓰이는 Jackson 라이브러리 클래스.
-            //Jackson 라이브러리의 기본 클래스이며 Java 개체와 JSON 데이터 간의 변환 기능을 제공한다.
-            String json = new ObjectMapper().writeValueAsString(new SecurityExceptionDto(statusCode, msg));
-            //response의 body에 JSON 문자열이 작성됨
-            response.getOutputStream().write(json.getBytes());
-        } catch (Exception e) {
-            //예외를 처리하는 동안 발생하는 모든 예외(Exception)을 기록한다.
-            log.error(e.getMessage());
-        }
     }
 
     //위 핸들러를 쓰고 dto로 리턴하기
-    private void handleMemberException(String message, HttpStatus status, HttpServletResponse response) {
+    private MemberResponseMsgDto handleMemberException(String message, HttpStatus status, HttpServletResponse response) {
         memberExceptionHandler(response, message, status.value());
+        return new MemberResponseMsgDto(message, status.value());
     }
 
     //정규식 검증 따로 빼 두기
@@ -280,7 +270,6 @@ public class MembersService {
 
     @Transactional
     public MemberResponseMsgDto signup(MemberSignupRequestDto memberSignupRequestDto, HttpServletResponse response){
-        String phoneNum = memberSignupRequestDto.getPhoneNum();
 
         /*
          * 핸드폰 번호 검증을 먼저 실행합니다.
@@ -288,18 +277,15 @@ public class MembersService {
          */
 
 
-
-
         //입력된 핸드폰 번호가 db에 있으면 이미 가입한 회원
         if (isExistMember(memberSignupRequestDto.getPhoneNum())) {
-//            memberExceptionHandler(response, "이미 가입한 회원입니다!", HttpStatus.BAD_REQUEST.value());
-            throw new IllegalArgumentException("이미 가입한 회원입니다!");
+            return handleMemberException("이미 존재하는 회원입니다!", HttpStatus.BAD_REQUEST, response);
+
         }
 
         //위 정규식과 다르면 입력 양식이 잘못된 것
         if (!isValidPhoneNum(memberSignupRequestDto.getPhoneNum())) {
-//            handleMemberException("번호 양식을 지켜주세요!", HttpStatus.BAD_REQUEST, response);
-            throw new IllegalArgumentException("번호 양식을 지켜주세요!");
+            return handleMemberException("번호 양식을 지켜주세요!", HttpStatus.BAD_REQUEST, response);
         }
 
 
@@ -309,8 +295,8 @@ public class MembersService {
          */
 
         if (!isValidBirthDate(memberSignupRequestDto.getBirthDate())) {
-//            handleMemberException("생년월일 양식을 지켜주세요!", HttpStatus.BAD_REQUEST, response);
-            throw new IllegalArgumentException("생년월일 양식을 지켜주세요!");
+           return handleMemberException("생년월일 양식을 지켜주세요!", HttpStatus.BAD_REQUEST, response);
+
         }
 
 
@@ -320,8 +306,7 @@ public class MembersService {
          */
 
         if (!isValidNickName(memberSignupRequestDto.getNickName())) {
-//            handleMemberException("닉네임 양식을 지켜주세요!", HttpStatus.BAD_REQUEST, response);
-            throw new IllegalArgumentException("닉네임 양식을 지켜주세요!");
+            return handleMemberException("닉네임 양식을 지켜주세요!", HttpStatus.BAD_REQUEST, response);
         }
 
 
@@ -331,8 +316,8 @@ public class MembersService {
          */
 
         if (!isValidPassword(memberSignupRequestDto.getPassword())) {
-//            handleMemberException("비밀번호는 영어 대소문자, 숫자의 최소 8자에서 최대 12자리여야 합니다.", HttpStatus.BAD_REQUEST, response);
-            throw new IllegalArgumentException("비밀번호는 영어 대소문자, 숫자의 최소 8자에서 최대 12자리여야 합니다.");
+           return handleMemberException("비밀번호는 영어 대소문자, 숫자의 최소 8자에서 최대 12자리여야 합니다.", HttpStatus.BAD_REQUEST, response);
+
         }
 
 
