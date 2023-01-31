@@ -14,7 +14,7 @@ public class MatchingResponseDto {
     private Long memberId;
     private String nickName;
     private String profile;
-    private double distance;
+    private int distance;
     private int age;
     private Long roomId;
 }
