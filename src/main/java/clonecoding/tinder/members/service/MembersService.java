@@ -5,16 +5,12 @@ import clonecoding.tinder.like.entity.Likes;
 import clonecoding.tinder.like.repository.LikeRepository;
 import clonecoding.tinder.matching.model.Room;
 import clonecoding.tinder.matching.repository.RoomRepository;
-import clonecoding.tinder.members.dto.MemberLoginRequestDto;
-import clonecoding.tinder.members.dto.MemberResponseMsgDto;
-import clonecoding.tinder.members.dto.MemberSignupRequestDto;
+import clonecoding.tinder.members.dto.*;
 import clonecoding.tinder.members.entity.Member;
 import clonecoding.tinder.members.repository.MemberRedisRepository;
 import clonecoding.tinder.members.repository.MemberRepository;
-import clonecoding.tinder.members.dto.MemberFindRequestDto;
-import clonecoding.tinder.members.dto.MemberSearch;
-import clonecoding.tinder.members.dto.MembersResponseDto;
 import clonecoding.tinder.security.UserDetailsImpl;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,6 +46,9 @@ public class MembersService {
 
     @Value("${jwt.token.expired-time-ms}")
     private Long expiredTimeMs;
+
+
+
 
 
     //todo 초기데이터 삭제할 것
@@ -224,6 +223,59 @@ public class MembersService {
     *
      */
 
+    //예외처리해서 클라이언트 상태코드도 커스텀하기 위해
+    public void memberExceptionHandler(HttpServletResponse response, String msg, int statusCode) {
+        //setStatus를 통해 response의 상태 코드 set
+        response.setStatus(statusCode);
+        //콘텐츠 유형을 json으로 바꿔줌
+        response.setContentType("application/json");
+        try {
+            //ObjectMapper 클래스를 사용하여 클래스의 객체를 SecurityExceptionDtoJSON 문자열로 변환.
+            //objectMapper는 자바 객체를 JSON으로 직렬화나 역직렬화 하는데 쓰이는 Jackson 라이브러리 클래스.
+            //Jackson 라이브러리의 기본 클래스이며 Java 개체와 JSON 데이터 간의 변환 기능을 제공한다.
+            String json = new ObjectMapper().writeValueAsString(new SecurityExceptionDto(statusCode, msg));
+            //response의 body에 JSON 문자열이 작성됨
+            response.getWriter().write(json);
+        } catch (Exception e) {
+            //예외를 처리하는 동안 발생하는 모든 예외(Exception)을 기록한다.
+            log.error(e.getMessage());
+        }
+    }
+
+    //위 핸들러를 쓰고 dto로 리턴하기
+    private MemberResponseMsgDto handleMemberException(String message, HttpStatus status, HttpServletResponse response) {
+        memberExceptionHandler(response, message, status.value());
+        return new MemberResponseMsgDto(message, status.value());
+    }
+
+    //정규식 검증 따로 빼 두기
+    private boolean isValidNickName(String nickName) {
+        return nickName.matches("^[가-힣a-zA-Z]{2,6}$");
+    }
+
+    //시작은 010으로 시작, 뒤에는 숫자만 8자리가 와야함.
+    private boolean isValidPhoneNum(String phoneNum) {
+        return phoneNum.matches("^010(\\d{8})$");
+    }
+
+    // \\d{2}연도 두 자리는 아무거나 와도 되니까 따로 조건을 걸지 않고 숫자만 오면 상관없게 하였음.
+
+    // ([0]\\d|[1][0-2]) 월의 경우 앞자리가 0이면 뒤에는 1-9만 오도록 하였음.
+    // 앞의 자리가 1인 경우에는 0,1,2만 올 수 있도록 하였음.
+
+    //([0][1-9]|[1-2]\\d|[3][0-1]) 일의 경우 앞자리가 0이면 뒤에는 1-9,
+    // 1이나 2인 경우엔 숫자 아무거나, 3인 경우에는 0이나 1만 올 수 있도록 함.
+    private boolean isValidBirthDate(String birthDate) {
+        return birthDate.matches("^\\d{2}([0]\\d|[1][0-2])([0][1-9]|[1-2]\\d|[3][0-1])$");
+    }
+
+    // ?= 뒷부분을 확인하겠다. .* 하나라도 있는 지 체크. .은 어떤 한 개의 문자, *은 앞의 문자가 0개 이상 있음을 의미.
+    private boolean isValidPassword(String password) {
+        return password.matches("(?=.*[0-9])(?=.*[a-zA-Z]).{8,12}");
+    }
+
+
+
 
     @Transactional
     public MemberResponseMsgDto signup(MemberSignupRequestDto memberSignupRequestDto, HttpServletResponse response) {
@@ -234,12 +286,10 @@ public class MembersService {
          *
          */
 
-        //시작은 010으로 시작, 뒤에는 숫자만 8자리가 와야함.
-        String phoneRegExp = "^010(\\d{8})$";
 
         //위 정규식과 다르면 입력 양식이 잘못된 것
-        if (!phoneNum.matches(phoneRegExp)) {
-            return new MemberResponseMsgDto("번호 양식을 지켜주세요!", HttpStatus.BAD_REQUEST.value());
+        if (!isValidPhoneNum(memberSignupRequestDto.getPhoneNum())) {
+            return handleMemberException("번호 양식을 지켜주세요!", HttpStatus.BAD_REQUEST, response);
         }
 
         //db에서 입력된 핸드폰 번호로 회원 조회
@@ -247,6 +297,7 @@ public class MembersService {
 
         //입력된 핸드폰 번호가 db에 있으면 이미 가입한 회원
         if (existMember.isPresent()) {
+            memberExceptionHandler(response,"이미 가입한 회원입니다!", HttpStatus.BAD_REQUEST.value());
             return new MemberResponseMsgDto("이미 가입한 회원입니다!", HttpStatus.BAD_REQUEST.value());
         }
 
@@ -256,18 +307,8 @@ public class MembersService {
          *
          */
 
-        //정규식 적용이 안돼서 그냥 matches에 넣었습니다.
-        // \\d{2}연도 두 자리는 아무거나 와도 되니까 따로 조건을 걸지 않고 숫자만 오면 상관없게 하였음.
-
-        // ([0]\\d|[1][0-2]) 월의 경우 앞자리가 0이면 뒤에는 1-9만 오도록 하였음.
-        // 앞의 자리가 1인 경우에는 0,1,2만 올 수 있도록 하였음.
-
-        //([0][1-9]|[1-2]\\d|[3][0-1]) 일의 경우 앞자리가 0이면 뒤에는 1-9,
-        // 1이나 2인 경우엔 숫자 아무거나, 3인 경우에는 0이나 1만 올 수 있도록 함.
-//        String birthDateRegExp = "^\\d{2}([0]\\d|[1][0-2])([0][1-9]|[1-2]\\d|[3][0-1])$";
-
-        if (!memberSignupRequestDto.getBirthDate().matches("^\\d{2}([0]\\d|[1][0-2])([0][1-9]|[1-2]\\d|[3][0-1])$")) {
-            return new MemberResponseMsgDto("생년월일 양식을 지켜주세요!", HttpStatus.BAD_REQUEST.value());
+        if (!isValidBirthDate(memberSignupRequestDto.getBirthDate())) {
+            return handleMemberException("생년월일 양식을 지켜주세요!", HttpStatus.BAD_REQUEST, response);
         }
 
 
@@ -276,10 +317,8 @@ public class MembersService {
          *
          */
 
-        //생년월일과 마찬가지 입니다.
-//        String nickNameRegExp = "^[가-힣a-zA-Z]{2,6}$";
-        if (!memberSignupRequestDto.getNickName().matches("^[가-힣a-zA-Z]{2,6}$")) {
-            return new MemberResponseMsgDto("닉네임 양식을 지켜주세요!", HttpStatus.BAD_REQUEST.value());
+        if (!isValidNickName(memberSignupRequestDto.getNickName())) {
+            return handleMemberException("닉네임 양식을 지켜주세요!", HttpStatus.BAD_REQUEST, response);
         }
 
 
@@ -288,10 +327,8 @@ public class MembersService {
          *
          */
 
-        // ?= 뒷부분을 확인하겠다. .* 하나라도 있는 지 체크. .은 어떤 한 개의 문자, *은 앞의 문자가 0개 이상 있음을 의미.
-//        if (memberSignupRequestDto.getPassword().matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,12}$")) {
-        if (!memberSignupRequestDto.getPassword().matches("(?=.*[0-9])(?=.*[a-zA-Z]).{8,12}")) {
-            return new MemberResponseMsgDto("비밀번호는 영어 대소문자, 숫자의 최소 8자에서 최대 12자리여야 합니다.", HttpStatus.BAD_REQUEST.value());
+        if (!isValidPassword(memberSignupRequestDto.getPassword())) {
+            return handleMemberException("비밀번호는 영어 대소문자, 숫자의 최소 8자에서 최대 12자리여야 합니다.", HttpStatus.BAD_REQUEST, response);
         }
 
 
