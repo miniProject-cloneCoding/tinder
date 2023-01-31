@@ -48,9 +48,6 @@ public class MembersService {
     private Long expiredTimeMs;
 
 
-
-
-
     //todo 초기데이터 삭제할 것
 //    @PostConstruct
     public void init() {
@@ -214,13 +211,13 @@ public class MembersService {
     }
 
     /*
-    *
-    *
-    *
-    * 회원가입 / 로그인 파트입니다
-    *
-    *
-    *
+     *
+     *
+     *
+     * 회원가입 / 로그인 파트입니다
+     *
+     *
+     *
      */
 
     //예외처리해서 클라이언트 상태코드도 커스텀하기 위해
@@ -235,7 +232,7 @@ public class MembersService {
             //Jackson 라이브러리의 기본 클래스이며 Java 개체와 JSON 데이터 간의 변환 기능을 제공한다.
             String json = new ObjectMapper().writeValueAsString(new SecurityExceptionDto(statusCode, msg));
             //response의 body에 JSON 문자열이 작성됨
-            response.getWriter().write(json);
+            response.getOutputStream().write(json.getBytes());
         } catch (Exception e) {
             //예외를 처리하는 동안 발생하는 모든 예외(Exception)을 기록한다.
             log.error(e.getMessage());
@@ -275,8 +272,6 @@ public class MembersService {
     }
 
 
-
-
     @Transactional
     public MemberResponseMsgDto signup(MemberSignupRequestDto memberSignupRequestDto, HttpServletResponse response) {
         String phoneNum = memberSignupRequestDto.getPhoneNum();
@@ -287,18 +282,18 @@ public class MembersService {
          */
 
 
-        //위 정규식과 다르면 입력 양식이 잘못된 것
-        if (!isValidPhoneNum(memberSignupRequestDto.getPhoneNum())) {
-            return handleMemberException("번호 양식을 지켜주세요!", HttpStatus.BAD_REQUEST, response);
-        }
-
         //db에서 입력된 핸드폰 번호로 회원 조회
         Optional<Member> existMember = memberRepository.findByPhoneNum(phoneNum);
 
         //입력된 핸드폰 번호가 db에 있으면 이미 가입한 회원
         if (existMember.isPresent()) {
-            memberExceptionHandler(response,"이미 가입한 회원입니다!", HttpStatus.BAD_REQUEST.value());
+            memberExceptionHandler(response, "이미 가입한 회원입니다!", HttpStatus.BAD_REQUEST.value());
             return new MemberResponseMsgDto("이미 가입한 회원입니다!", HttpStatus.BAD_REQUEST.value());
+        }
+
+        //위 정규식과 다르면 입력 양식이 잘못된 것
+        if (!isValidPhoneNum(memberSignupRequestDto.getPhoneNum())) {
+            return handleMemberException("번호 양식을 지켜주세요!", HttpStatus.BAD_REQUEST, response);
         }
 
 

@@ -29,7 +29,6 @@ public class Member {
     @Column(nullable = false)
     private String profile; //프로필사진 URL
 
-    //    @Column(nullable = false)
     private String email;
     private double latitude; //위도
     private double longitude; //경도
