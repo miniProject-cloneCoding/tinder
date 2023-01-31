@@ -79,6 +79,26 @@ public class CommentService {
         commentRepository.save(comment);
     }
 
+    //댓글 수정하기
+    public void updateComments(String phoneNum, CommentRequestDto requestDto, Long commentId) {
+        //내 정보 찾아오기
+        Comment comment = getComment(phoneNum, commentId);
+
+        comment.setContent(requestDto.getContent());
+
+        //댓글 저장
+        commentRepository.save(comment);
+    }
+
+    //댓글 삭제하기
+    public void deleteComments(String phoneNum, Long commentId) {
+        //댓글 찾아오기
+        Comment comment = getComment(phoneNum, commentId);
+
+        commentRepository.delete(comment);
+    }
+
+    //상대방과 나의 프로필 정보 가져오기
     public ProfileResponseDto getProfile(String phoneNum, Long roomId) {
         //내 정보 찾아오기
         Member my = findMember(phoneNum);
@@ -96,6 +116,23 @@ public class CommentService {
                 .build();
     }
 
+    /*
+     댓글 찾아오기
+     댓글 작성자와 로그인한 내 정보가 일치하는 경운에만 comment 가져온다
+     */
+    private Comment getComment(String phoneNum, Long commentId) {
+        Member my = findMember(phoneNum);
+
+        Comment comment = commentRepository.findById(commentId).orElseThrow(
+                () -> new IllegalArgumentException("댓글이 존재하지 않습니다")
+        );
+
+        //작성자가 일치하지 않는 경우
+        if (!comment.getSender().equals(my.getNickName())) {
+            throw new IllegalArgumentException("본인의 댓글만 수정할 수 있습니다");
+        }
+        return comment;
+    }
 
     //상대방 정보 찾기
     private Member findOppositeMember(Long memberId) {
