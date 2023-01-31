@@ -18,7 +18,7 @@ public class MembersResponseDto {
     private String profile;
     private double latitude;
     private double longitude;
-    private double distance;
+    private int distance;
     private int age;
 
 

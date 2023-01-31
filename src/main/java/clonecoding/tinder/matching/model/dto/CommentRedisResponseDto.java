@@ -16,8 +16,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommentResponseDto {
-    private Long commentId;
+public class CommentRedisResponseDto {
 
     private String sender;
     private String content;
@@ -27,6 +26,5 @@ public class CommentResponseDto {
     @CreatedDate
     private LocalDateTime createdAt;
     private Long roomId;
-    private boolean status;
 
 }
