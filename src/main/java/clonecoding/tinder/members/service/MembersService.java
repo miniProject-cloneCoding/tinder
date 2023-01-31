@@ -254,6 +254,13 @@ public class MembersService {
         return phoneNum.matches("^010(\\d{8})$");
     }
 
+    private boolean isExistMember(String phoneNum) {
+        //db에서 입력된 핸드폰 번호로 회원 조회
+        Optional<Member> existMember = memberRepository.findByPhoneNum(phoneNum);
+
+        return existMember.isPresent();
+    }
+
     // \\d{2}연도 두 자리는 아무거나 와도 되니까 따로 조건을 걸지 않고 숫자만 오면 상관없게 하였음.
 
     // ([0]\\d|[1][0-2]) 월의 경우 앞자리가 0이면 뒤에는 1-9만 오도록 하였음.
@@ -281,11 +288,10 @@ public class MembersService {
          */
 
 
-        //db에서 입력된 핸드폰 번호로 회원 조회
-        Optional<Member> existMember = memberRepository.findByPhoneNum(phoneNum);
+
 
         //입력된 핸드폰 번호가 db에 있으면 이미 가입한 회원
-        if (existMember.isPresent()) {
+        if (isExistMember(memberSignupRequestDto.getPhoneNum())) {
 //            memberExceptionHandler(response, "이미 가입한 회원입니다!", HttpStatus.BAD_REQUEST.value());
             throw new IllegalArgumentException("이미 가입한 회원입니다!");
         }
