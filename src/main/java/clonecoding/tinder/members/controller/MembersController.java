@@ -1,10 +1,6 @@
 package clonecoding.tinder.members.controller;
 
-import clonecoding.tinder.members.dto.MemberLoginRequestDto;
-import clonecoding.tinder.members.dto.MemberResponseMsgDto;
-import clonecoding.tinder.members.dto.MemberSignupRequestDto;
-import clonecoding.tinder.members.dto.MemberFindRequestDto;
-import clonecoding.tinder.members.dto.MembersResponseDto;
+import clonecoding.tinder.members.dto.*;
 import clonecoding.tinder.members.service.MembersService;
 import clonecoding.tinder.security.UserDetailsImpl;
 import io.swagger.annotations.ApiOperation;
@@ -41,7 +37,7 @@ public class MembersController {
     }
 
     @PostMapping("/signup")
-    public MemberResponseMsgDto signup(@RequestBody MemberSignupRequestDto memberSignupRequestDto, HttpServletResponse response) {
+    public MemberResponseMsgDto signup(@RequestBody MemberSignupRequestDto memberSignupRequestDto, HttpServletResponse response)  {
         return membersService.signup(memberSignupRequestDto, response);
     }
 

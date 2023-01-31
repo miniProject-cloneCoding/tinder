@@ -240,9 +240,8 @@ public class MembersService {
     }
 
     //위 핸들러를 쓰고 dto로 리턴하기
-    private MemberResponseMsgDto handleMemberException(String message, HttpStatus status, HttpServletResponse response) {
+    private void handleMemberException(String message, HttpStatus status, HttpServletResponse response) {
         memberExceptionHandler(response, message, status.value());
-        return new MemberResponseMsgDto(message, status.value());
     }
 
     //정규식 검증 따로 빼 두기
@@ -273,7 +272,7 @@ public class MembersService {
 
 
     @Transactional
-    public MemberResponseMsgDto signup(MemberSignupRequestDto memberSignupRequestDto, HttpServletResponse response) {
+    public MemberResponseMsgDto signup(MemberSignupRequestDto memberSignupRequestDto, HttpServletResponse response){
         String phoneNum = memberSignupRequestDto.getPhoneNum();
 
         /*
@@ -287,13 +286,14 @@ public class MembersService {
 
         //입력된 핸드폰 번호가 db에 있으면 이미 가입한 회원
         if (existMember.isPresent()) {
-            memberExceptionHandler(response, "이미 가입한 회원입니다!", HttpStatus.BAD_REQUEST.value());
-            return new MemberResponseMsgDto("이미 가입한 회원입니다!", HttpStatus.BAD_REQUEST.value());
+//            memberExceptionHandler(response, "이미 가입한 회원입니다!", HttpStatus.BAD_REQUEST.value());
+            throw new IllegalArgumentException("이미 가입한 회원입니다!");
         }
 
         //위 정규식과 다르면 입력 양식이 잘못된 것
         if (!isValidPhoneNum(memberSignupRequestDto.getPhoneNum())) {
-            return handleMemberException("번호 양식을 지켜주세요!", HttpStatus.BAD_REQUEST, response);
+//            handleMemberException("번호 양식을 지켜주세요!", HttpStatus.BAD_REQUEST, response);
+            throw new IllegalArgumentException("번호 양식을 지켜주세요!");
         }
 
 
@@ -303,7 +303,8 @@ public class MembersService {
          */
 
         if (!isValidBirthDate(memberSignupRequestDto.getBirthDate())) {
-            return handleMemberException("생년월일 양식을 지켜주세요!", HttpStatus.BAD_REQUEST, response);
+//            handleMemberException("생년월일 양식을 지켜주세요!", HttpStatus.BAD_REQUEST, response);
+            throw new IllegalArgumentException("생년월일 양식을 지켜주세요!");
         }
 
 
@@ -313,7 +314,8 @@ public class MembersService {
          */
 
         if (!isValidNickName(memberSignupRequestDto.getNickName())) {
-            return handleMemberException("닉네임 양식을 지켜주세요!", HttpStatus.BAD_REQUEST, response);
+//            handleMemberException("닉네임 양식을 지켜주세요!", HttpStatus.BAD_REQUEST, response);
+            throw new IllegalArgumentException("닉네임 양식을 지켜주세요!");
         }
 
 
@@ -323,7 +325,8 @@ public class MembersService {
          */
 
         if (!isValidPassword(memberSignupRequestDto.getPassword())) {
-            return handleMemberException("비밀번호는 영어 대소문자, 숫자의 최소 8자에서 최대 12자리여야 합니다.", HttpStatus.BAD_REQUEST, response);
+//            handleMemberException("비밀번호는 영어 대소문자, 숫자의 최소 8자에서 최대 12자리여야 합니다.", HttpStatus.BAD_REQUEST, response);
+            throw new IllegalArgumentException("비밀번호는 영어 대소문자, 숫자의 최소 8자에서 최대 12자리여야 합니다.");
         }
 
 
