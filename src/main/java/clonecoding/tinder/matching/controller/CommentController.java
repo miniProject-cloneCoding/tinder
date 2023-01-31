@@ -32,6 +32,22 @@ public class CommentController {
         commentService.createComments(userDetails.getMember().getPhoneNum(), requestDto);
         return "댓글 작성 완료";
     }
+    @ApiOperation(value = "댓글수정")
+    @PatchMapping("/comments/{commentId}")
+    public String updateComments(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                 @RequestBody CommentRequestDto requestDto,
+                                 @PathVariable Long commentId) {
+        commentService.updateComments(userDetails.getMember().getPhoneNum(), requestDto, commentId);
+        return "댓글 수정 완료";
+    }
+
+    @ApiOperation(value = "댓글삭제")
+    @DeleteMapping("/comments/{commentId}")
+    public String deleteComments(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                 @PathVariable Long commentId) {
+        commentService.deleteComments(userDetails.getMember().getPhoneNum(), commentId);
+        return "댓글 삭제 완료";
+    }
 
     @ApiOperation(value = "나와 매칭된 회원 조회 상세페이지")
     @GetMapping("/profile/{roomId}")

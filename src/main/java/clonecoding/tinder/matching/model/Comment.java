@@ -33,4 +33,8 @@ public class Comment {
         this.content = content;
         this.room = room;
     }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
 }
