@@ -188,6 +188,16 @@ public class MembersService {
                 .collect(Collectors.toList());
     }
 
+    //로그인한 내 정보 찾아오기 (Redis에서 먼저 검색 후 없으면 DB 접근)
+    private Member findMember(String phoneNum) {
+        UserDetailsImpl member = redisRepository.getUser(phoneNum).orElseGet(
+                () -> memberRepository.findByPhoneNum(phoneNum).map(UserDetailsImpl::fromEntity).orElseThrow(
+                        () -> new IllegalArgumentException("로그인을 해주세요.")
+                ));
+
+        return member.getMember();
+    }
+
     //생년월일에서 나이 가져오기
     private int calculateAge(String birthDate) {
         int year = Integer.parseInt(birthDate.substring(0, 2));
@@ -210,6 +220,12 @@ public class MembersService {
         return earthRadius * Math.acos(Math.sin(lat1) * Math.sin(lat2) + Math.cos(lat1) * Math.cos(lat2) * Math.cos(lon1 - lon2));
     }
 
+    private int roundDistance(double distance) {
+        if (Math.round(distance) < 1) {
+            return 1;
+        }
+        return (int) Math.round(distance);
+    }
     /*
      *
      *
@@ -367,22 +383,5 @@ public class MembersService {
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(member.getPhoneNum()));
 
         return new MemberResponseMsgDto("로그인 완료.", HttpStatus.OK.value());
-    }
-
-    //로그인한 내 정보 찾아오기 (Redis에서 먼저 검색 후 없으면 DB 접근)
-    private Member findMember(String phoneNum) {
-        UserDetailsImpl member = redisRepository.getUser(phoneNum).orElseGet(
-                () -> memberRepository.findByPhoneNum(phoneNum).map(UserDetailsImpl::fromEntity).orElseThrow(
-                        () -> new IllegalArgumentException("로그인을 해주세요.")
-                ));
-
-        return member.getMember();
-    }
-
-    private int roundDistance(double distance) {
-        if (Math.round(distance) < 1) {
-            return 1;
-        }
-        return (int) Math.round(distance);
     }
 }

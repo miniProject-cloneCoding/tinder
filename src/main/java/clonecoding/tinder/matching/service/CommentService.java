@@ -59,7 +59,7 @@ public class CommentService {
     }
 
     //댓글 작성하기
-    public void createComments(String phoneNum, CommentRequestDto requestDto) {
+    public CommentResponseDto createComments(String phoneNum, CommentRequestDto requestDto) {
         log.info("댓글 작성하기 실행");
 
         //내 정보 찾아오기
@@ -78,6 +78,15 @@ public class CommentService {
 
         Comment comment = new Comment(my.getNickName(), requestDto.getContent(), room);
         commentRepository.save(comment);
+
+        return CommentResponseDto.builder()
+                .commentId(comment.getCommentId())
+                .sender(comment.getSender())
+                .content(comment.getContent())
+                .createdAt(comment.getCreatedAt())
+                .roomId(comment.getRoom().getId())
+                .status(true)
+                .build();
     }
 
     //댓글 수정하기
