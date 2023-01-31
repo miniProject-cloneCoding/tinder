@@ -5,6 +5,7 @@ import clonecoding.tinder.matching.model.Comments;
 import clonecoding.tinder.matching.model.Room;
 import clonecoding.tinder.matching.model.dto.CommentRequestDto;
 import clonecoding.tinder.matching.model.dto.CommentResponseDto;
+import clonecoding.tinder.matching.model.dto.CommentUpdateDto;
 import clonecoding.tinder.matching.model.dto.ProfileResponseDto;
 import clonecoding.tinder.matching.repository.CommentRepository;
 import clonecoding.tinder.matching.repository.RoomRepository;
@@ -80,7 +81,7 @@ public class CommentService {
     }
 
     //댓글 수정하기
-    public void updateComments(String phoneNum, CommentRequestDto requestDto, Long commentId) {
+    public void updateComments(String phoneNum, CommentUpdateDto requestDto, Long commentId) {
         //내 정보 찾아오기
         Comment comment = getComment(phoneNum, commentId);
 
