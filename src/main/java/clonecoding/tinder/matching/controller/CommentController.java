@@ -28,8 +28,9 @@ public class CommentController {
     //댓글 작성하기
     @ApiOperation(value = "댓글달기")
     @PostMapping("/comments")
-    public CommentResponseDto createComments(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody CommentRequestDto requestDto) {
-        return commentService.createComments(userDetails.getMember().getPhoneNum(), requestDto);
+    public String createComments(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody CommentRequestDto requestDto) {
+        commentService.createComments(userDetails.getMember().getPhoneNum(), requestDto);
+        return "댓글 작성 완료";
     }
 
     @ApiOperation(value = "나와 매칭된 회원 조회 상세페이지")

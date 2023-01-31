@@ -24,6 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -184,9 +185,7 @@ public class MembersService {
                                 .nickName(membersResponseDto.getNickName())
                                 .birthDate(membersResponseDto.getBirthDate())
                                 .profile(membersResponseDto.getProfile())
-                                .distance(
-                                        calculateDistance(my.getLatitude(), my.getLongitude(), membersResponseDto.getLatitude(), membersResponseDto.getLongitude())
-                                )
+                                .distance(roundDistance(calculateDistance(my.getLatitude(), my.getLongitude(), membersResponseDto.getLatitude(), membersResponseDto.getLongitude())))
                                 .age(calculateAge(membersResponseDto.getBirthDate()))
                                 .build())
                 .sorted(Comparator.comparing(MembersResponseDto::getDistance))
@@ -352,5 +351,12 @@ public class MembersService {
                 ));
 
         return member.getMember();
+    }
+
+    private int roundDistance(double distance) {
+        if (Math.round(distance) < 1) {
+            return 1;
+        }
+        return (int) Math.round(distance);
     }
 }

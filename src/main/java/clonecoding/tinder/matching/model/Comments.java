@@ -1,5 +1,6 @@
 package clonecoding.tinder.matching.model;
 
+import clonecoding.tinder.matching.model.dto.CommentRedisResponseDto;
 import clonecoding.tinder.matching.model.dto.CommentResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,5 +16,5 @@ import java.util.List;
 @AllArgsConstructor
 public class Comments {
 
-    private List<CommentResponseDto> comments = new ArrayList<>();
+    private List<CommentRedisResponseDto> comments = new ArrayList<>();
 }
