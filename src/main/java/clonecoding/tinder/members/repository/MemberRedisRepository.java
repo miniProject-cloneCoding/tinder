@@ -23,7 +23,7 @@ public class MemberRedisRepository {
 
     public void setUser(UserDetailsImpl user) {
 
-        //유저이름을 가지고 키를 만들어준다
+        //유저 휴대폰번호를 가지고 키를 만들어준다
         String key = getKey(user.getPhoneNum());
         log.info("Redis에 회원저장 {}({})", key, user);
 
