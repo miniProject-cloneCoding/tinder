@@ -37,13 +37,24 @@ public class LikeService {
         Member likedMember = memberRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("존재하지 않는 유저입니다.")
         );
+
+        if (id.equals(likingMember.getId())) {
+            return new LikeResponseDto("잘못된 요청입니다. (본인 아이디인지의 여부를 확인해 주세요)", HttpStatus.BAD_REQUEST.value());
+        }
+
+        log.info("<좋아요 객체 저장> " + "좋아요 눌린사람 아이디 = " + likedMember.getId());
+        log.info("<좋아요 객체 저장> " + "좋아요 누른사람 아이디 = " + likingMember.getId());
         // 좋아요 객체 저장
         Likes likes = new Likes(likedMember.getId(), likingMember.getId());
 
+        log.info("아이디 잘 찾아오나 = " + likeRepository.findByLikedMemberAndLikingMember(id, likingMember.getId()).isPresent());
         //좋아요를 누른적이 없으면 db 저장
         if (likeRepository.findByLikedMemberAndLikingMember(id, likingMember.getId()).isEmpty()) {
             likeRepository.save(likes);
+        }else {
+            return new LikeResponseDto("이미 좋아요를 눌렀습니다!", HttpStatus.BAD_REQUEST.value());
         }
+
 
         //좋아요가 눌린적 없다면
         if (rankingRepository.findByLikedMember(likedMember.getId()).isEmpty()) {
