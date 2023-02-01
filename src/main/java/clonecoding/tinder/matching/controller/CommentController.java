@@ -34,11 +34,10 @@ public class CommentController {
     }
     @ApiOperation(value = "댓글수정")
     @PatchMapping("/comments/{commentId}")
-    public String updateComments(@AuthenticationPrincipal UserDetailsImpl userDetails,
+    public CommentResponseDto updateComments(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                  @RequestBody CommentUpdateDto requestDto,
                                  @PathVariable Long commentId) {
-        commentService.updateComments(userDetails.getMember().getPhoneNum(), requestDto, commentId);
-        return "댓글 수정 완료";
+        return commentService.updateComments(userDetails.getMember().getPhoneNum(), requestDto, commentId);
     }
 
     @ApiOperation(value = "댓글삭제")
