@@ -64,8 +64,6 @@ public class WebSecurityConfig {
                 .antMatchers("/members/**").permitAll()
                 .antMatchers("/upload").permitAll()
 
-
-
                 //swagger 관련해서 인증 통과
                 .antMatchers(PERMIT_URL_ARRAY).permitAll()
                 //다른 것들은 전부 인증을 받아야 한다.
@@ -93,7 +91,8 @@ public class WebSecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.addAllowedOrigin("http://localhost:3000"); //프론트가 3000번 포트를 사용함
+        configuration.addAllowedOrigin("https://dating-app-clone-wnhr-ms7ptajve-met-co.vercel.app/");
+        configuration.addAllowedOrigin("http://localhost:3000");//프론트가 3000번 포트를 사용함
         configuration.setAllowCredentials(true);
         configuration.addAllowedMethod("*");
         configuration.addAllowedHeader("*");
