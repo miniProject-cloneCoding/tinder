@@ -126,7 +126,7 @@ public class MatchingService {
         if (roomRepository.findByMember1AndMember2(id1, id2).isPresent()) {
             return roomRepository.findByMember1AndMember2(id1, id2).get().getId();
         }
-        if (roomRepository.findByMember1AndMember2(id1, id2).isPresent()) {
+        if (roomRepository.findByMember1AndMember2(id2, id1).isPresent()) {
             return roomRepository.findByMember1AndMember2(id2, id1).get().getId();
         }
         return 0L;
