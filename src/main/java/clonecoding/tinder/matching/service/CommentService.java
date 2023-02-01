@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,6 +35,11 @@ public class CommentService {
     private final MemberRedisRepository redisRepository;
     private final RoomRepository roomRepository;
     private final CommentRepository commentRepository;
+
+    @PostConstruct
+    void init() {
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
+    }
 
     //상대방과 내가 주고받은 모든 댓글 가져오기
     public List<CommentResponseDto> getComments(String phoneNum, Long roomId) {
