@@ -88,7 +88,7 @@ public class MembersService {
     public static Map<Long, MembersResponseDto> map = new HashMap<>(); //좋아요 한 회원 삭제하는 용도
 
     //회원 전체 페이징하여 조회하기
-    public Page<MembersResponseDto> getMembers(Pageable pageable, String phoneNum) {
+    public Page<MembersResponseDto> getMembers(String phoneNum) {
 
         //내 정보 가져오기
         Member my = findMember(phoneNum);
@@ -97,8 +97,8 @@ public class MembersService {
         MemberSearch memberSearch = new MemberSearch(my.isWantingMale(), my.isWantingFemale());
 
         //전체 회원 중 이미 좋아요한 회원 제외하고 가져오기
-        //파라미터 (내 아이디, 페이지번호, 페이지 사이즈)
-        List<Member> members = memberRepository.findAllWithPaging(my.getId(), Long.valueOf(pageable.getOffset()).intValue(), pageable.getPageSize(), memberSearch);
+        //파라미터 (내 아이디, 성별검색조건)
+        List<Member> members = memberRepository.findAllWithPaging(my.getId(), memberSearch);
 
         //entity -> dto 변환
         Stream<MembersResponseDto> dtoList = members.stream().map(MembersResponseDto::fromEntity);
@@ -184,7 +184,7 @@ public class MembersService {
                                 .distance(roundDistance(calculateDistance(my.getLatitude(), my.getLongitude(), membersResponseDto.getLatitude(), membersResponseDto.getLongitude())))
                                 .age(calculateAge(membersResponseDto.getBirthDate()))
                                 .build())
-                .sorted(Comparator.comparing(MembersResponseDto::getDistance))
+                .sorted(Comparator.comparing(MembersResponseDto::getDistance).reversed())
                 .collect(Collectors.toList());
     }
 

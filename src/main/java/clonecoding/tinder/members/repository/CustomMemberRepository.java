@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface CustomMemberRepository {
 
-    List<Member> findAllWithPaging(Long myId, int offset, int limit, MemberSearch memberSearch);
+    List<Member> findAllWithPaging(Long myId, MemberSearch memberSearch);
     List<Member> findAllWithoutPaging(Long myId, MemberSearch memberSearch);
 }

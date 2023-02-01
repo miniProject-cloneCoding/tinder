@@ -23,11 +23,10 @@ public class MembersController {
 
     // 전체 회원 조회해서 가져오기
     @ApiOperation(value = "회원 전체 조회(페이징)")
-
     @GetMapping
-    public Page<MembersResponseDto> getMembers(Pageable pageable, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public Page<MembersResponseDto> getMembers(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         log.info("Members 컨트롤러 - 회원 전체 조회 실행");
-        return membersService.getMembers(pageable, userDetails.getMember().getPhoneNum());
+        return membersService.getMembers(userDetails.getMember().getPhoneNum());
     }
 
     @ApiOperation(value = "회원 한 명 조회")
