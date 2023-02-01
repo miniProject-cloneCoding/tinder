@@ -65,10 +65,11 @@ public class WebSecurityConfig {
                 .antMatchers("/upload").permitAll()
 
 
+
                 //swagger 관련해서 인증 통과
                 .antMatchers(PERMIT_URL_ARRAY).permitAll()
                 //다른 것들은 전부 인증을 받아야 한다.
-                .anyRequest().authenticated()
+//                .anyRequest().authenticated()
                 // JWT 인증/인가를 사용하기 위한 설정
                 // addFilterBefore -> 1번째 인자값의 필터가 2번째 인자값의 필터를 수행하기 전에 실행됨.
                 // 즉, Jwt필터를 이용해 일단 토큰이 제대로 되어 있는 지부터 확인한다.
