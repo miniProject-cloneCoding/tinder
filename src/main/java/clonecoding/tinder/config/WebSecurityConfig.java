@@ -91,8 +91,8 @@ public class WebSecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.addAllowedOrigin("https://dating-app-clone-wnhr-ms7ptajve-met-co.vercel.app/");
-        configuration.addAllowedOrigin("http://localhost:3000");//프론트가 3000번 포트를 사용함
+        configuration.addAllowedOrigin("https://dating-app-clone-wnhr-ms7ptajve-met-co.vercel.app");
+//        configuration.addAllowedOrigin("http://localhost:3000");//프론트가 3000번 포트를 사용함
         configuration.setAllowCredentials(true);
         configuration.addAllowedMethod("*");
         configuration.addAllowedHeader("*");
