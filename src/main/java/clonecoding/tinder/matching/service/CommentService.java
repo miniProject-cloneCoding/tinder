@@ -76,8 +76,8 @@ public class CommentService {
             throw new IllegalArgumentException("매칭되지 않은 상대에게는 댓글을 작성할 수 없습니다");
         }
 
-        Comment comment = new Comment(my.getNickName(), requestDto.getContent(), room);
-        commentRepository.save(comment);
+        Comment newComment = new Comment(my.getNickName(), requestDto.getContent(), room);
+        Comment comment = commentRepository.save(newComment);
 
         return CommentResponseDto.builder()
                 .commentId(comment.getCommentId())
@@ -90,7 +90,7 @@ public class CommentService {
     }
 
     //댓글 수정하기
-    public void updateComments(String phoneNum, CommentUpdateDto requestDto, Long commentId) {
+    public CommentResponseDto updateComments(String phoneNum, CommentUpdateDto requestDto, Long commentId) {
         //내 정보 찾아오기
         Comment comment = getComment(phoneNum, commentId);
 
@@ -98,6 +98,15 @@ public class CommentService {
 
         //댓글 저장
         commentRepository.save(comment);
+
+        return CommentResponseDto.builder()
+                .commentId(comment.getCommentId())
+                .sender(comment.getSender())
+                .content(comment.getContent())
+                .createdAt(comment.getCreatedAt())
+                .roomId(comment.getRoom().getId())
+                .status(true)
+                .build();
     }
 
     //댓글 삭제하기
